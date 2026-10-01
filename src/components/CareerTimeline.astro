@@ -1,0 +1,168 @@
+---
+type EducationMilestone = {
+  organisation: string;
+  title: string;
+  description: string;
+};
+
+type ExperienceMilestone = EducationMilestone & {
+  date: string;
+  label: string;
+};
+
+type Timeline =
+  | { id: "experience"; title: "Experience"; milestones: ExperienceMilestone[] }
+  | { id: "education"; title: "Education"; milestones: EducationMilestone[] };
+
+const timelines = [
+  {
+    id: "experience",
+    title: "Experience",
+    milestones: [
+      {
+        date: "2024", label: "2024–Present", organisation: "BBVA",
+        title: "AI Security Architect",
+        description: "Designing AI security architectures and adversarial evaluations across models, data, tools, and human decisions.",
+      },
+      {
+        date: "2020", label: "2020–2024", organisation: "Ecoembes",
+        title: "Machine Learning Engineer",
+        description: "Built machine-learning systems across computer vision, document NLP, route optimisation, and time-series forecasting, from data preparation to integration and monitoring.",
+      },
+      {
+        date: "2017", label: "2017–2020", organisation: "Capgemini",
+        title: "Data Scientist",
+        description: "Developed pricing and predictive-analytics models, operational Power BI reporting, and inventory decision support.",
+      },
+    ],
+  },
+  {
+    id: "education",
+    title: "Education",
+    milestones: [
+      {
+        organisation: "UNED",
+        title: "Bachelor’s Degree in Artificial Intelligence Engineering",
+        description: "Current undergraduate studies in artificial intelligence engineering.",
+      },
+      {
+        organisation: "MIOTI",
+        title: "Big Data & Data Science Master",
+        description: "240-hour programme in big data and data science.",
+      },
+      {
+        organisation: "MIOTI",
+        title: "Master in Machine Learning & Deep Learning",
+        description: "240-hour programme focused on machine learning and deep learning.",
+      },
+    ],
+  },
+] satisfies Timeline[];
+
+const gearPoints = (teeth: number) => Array.from({ length: teeth * 4 }, (_, index) => {
+  const angle = (index * Math.PI) / (teeth * 2);
+  const radius = index % 4 < 2 ? 22 : 18;
+  return `${24 + radius * Math.cos(angle)},${24 + radius * Math.sin(angle)}`;
+}).join(" ");
+---
+
+<div class="career-dual">
+{timelines.map((timeline) => (
+  <section class="career-section" id={timeline.id} aria-labelledby={`${timeline.id}-title`}>
+    <header class="career-heading">
+      <h2 id={`${timeline.id}-title`}>{timeline.title}</h2>
+    </header>
+    <ol class="career-timeline" data-career-timeline role="list">
+      {timeline.milestones.map((milestone) => (
+        <li class="career-milestone" data-career-milestone>
+          <span class="milestone-mechanism" aria-hidden="true">
+            <svg class="gear-primary" viewBox="0 0 48 48" focusable="false">
+              <polygon points={gearPoints(12)} />
+              <circle cx="24" cy="24" r="13" />
+              <path d="M24 11v8m0 10v8M11 24h8m10 0h8" />
+              <circle cx="24" cy="24" r="5" />
+            </svg>
+            <svg class="gear-satellite" viewBox="0 0 48 48" focusable="false">
+              <polygon points={gearPoints(8)} />
+              <circle cx="24" cy="24" r="8" />
+            </svg>
+          </span>
+          <div class="milestone-content">
+            {"date" in milestone && (
+              <time class="milestone-date" datetime={milestone.date}>{milestone.label}</time>
+            )}
+            <p class="milestone-organisation">{milestone.organisation}</p>
+            <h3>{milestone.title}</h3>
+            <p class="milestone-description">{milestone.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+))}
+</div>
+
+<script>
+  const timelines = [...document.querySelectorAll<HTMLOListElement>("[data-career-timeline]")].map((element) => ({
+    element,
+    milestones: [...element.querySelectorAll<HTMLElement>("[data-career-milestone]")].map((milestone) => ({
+      element: milestone,
+      node: milestone.querySelector<SVGElement>(".gear-primary")!,
+    })),
+  }));
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let scheduledFrame = 0;
+
+  const updateProgress = () => {
+    scheduledFrame = 0;
+    const readingLine = window.innerHeight * 0.62;
+    // Each timeline owns its geometry and progress; one cannot advance the other.
+    const measurements = timelines.map(({ element, milestones }) => {
+      const top = element.getBoundingClientRect().top;
+      const centers = milestones.map(({ node }) => {
+        const bounds = node.getBoundingClientRect();
+        return bounds.top + bounds.height / 2;
+      });
+      const first = centers[0];
+      const length = Math.max(centers[centers.length - 1] - first, 1);
+      return { top: first - top, length, centers, progress: Math.min(1, Math.max(0, (readingLine - first) / length)) };
+    });
+
+    timelines.forEach(({ element, milestones }, index) => {
+      const measurement = measurements[index];
+      element.style.setProperty("--rail-top", `${measurement.top}px`);
+      element.style.setProperty("--rail-length", `${measurement.length}px`);
+      element.style.setProperty("--timeline-progress", `${measurement.progress}`);
+      milestones.forEach((milestone, milestoneIndex) => {
+        milestone.element.dataset.active = String(measurement.centers[milestoneIndex] <= readingLine);
+      });
+    });
+  };
+
+  const requestProgress = () => {
+    if (!scheduledFrame) scheduledFrame = window.requestAnimationFrame(updateProgress);
+  };
+
+  const syncMotionPreference = () => {
+    window.cancelAnimationFrame(scheduledFrame);
+    scheduledFrame = 0;
+    window.removeEventListener("scroll", requestProgress);
+    window.removeEventListener("resize", requestProgress);
+
+    if (motionPreference.matches) {
+      for (const { element } of timelines) {
+        delete element.dataset.motion;
+        element.style.removeProperty("--timeline-progress");
+      }
+      return;
+    }
+
+    updateProgress();
+    for (const { element } of timelines) element.dataset.motion = "enabled";
+    window.addEventListener("scroll", requestProgress, { passive: true });
+    window.addEventListener("resize", requestProgress);
+  };
+
+  motionPreference.addEventListener("change", syncMotionPreference);
+  syncMotionPreference();
+</script>

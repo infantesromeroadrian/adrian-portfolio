@@ -1,0 +1,23 @@
+---
+import IdentityIntro from "../components/IdentityIntro.astro";
+import CareerTimeline from "../components/CareerTimeline.astro";
+import Certifications from "../components/Certifications.astro";
+import HackTheBoxHighlight from "../components/HackTheBoxHighlight.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Adrian Infantes — AI Security Architect"
+  description="Portfolio of Adrian Infantes, AI Security Architect and AI Red Teamer."
+>
+  <main>
+    <IdentityIntro />
+    <CareerTimeline />
+    <Certifications />
+    <HackTheBoxHighlight />
+  </main>
+  <footer class="portfolio-footer">
+    <span>Adrian Infantes</span>
+    <a href="#intro-title">Back to top</a>
+  </footer>
+</BaseLayout>

@@ -1,0 +1,119 @@
+<section class="identity-intro" aria-labelledby="intro-title">
+  <div class="editorial-panel">
+    <p class="editorial-kicker">
+      <span>Portfolio</span>
+      <span>AI Security</span>
+    </p>
+
+    <header class="editorial-heading">
+      <h1 id="intro-title">
+        <span>Adrian</span>
+        <span>Infantes</span>
+      </h1>
+      <p class="editorial-role">AI Security Architect</p>
+    </header>
+
+    <section class="editorial-about" aria-labelledby="about-title">
+      <h2 id="about-title">About</h2>
+      <p>
+        I design and test AI systems where security architecture meets offensive
+        research. My work focuses on AI security, AI red teaming, and the failure
+        modes of agents and machine-learning systems.
+      </p>
+    </section>
+
+    <div class="editorial-footer">
+      <p id="reveal-instruction" class="reveal-instruction reveal-instruction--pointer">
+        Move the cursor across the cover to reveal what is underneath.
+      </p>
+      <p class="reveal-instruction reveal-instruction--touch">
+        Swipe across the cover to reveal what is underneath.
+      </p>
+    </div>
+  </div>
+
+  <section class="identity-visual" aria-label="Interactive cover">
+    <button
+      type="button"
+      class="identity-frame"
+      data-identity-frame
+      aria-label="Reveal the l4tentnoise cover as an AI Red Teamer"
+      aria-describedby="reveal-instruction"
+      aria-pressed="false"
+    >
+      <span class="identity-cover identity-cover--offensive" aria-hidden="true">
+        <img
+          src="/images/l4tentnoise-ai-red-team-cover.png"
+          alt=""
+          width="1122"
+          height="1402"
+          draggable="false"
+        />
+      </span>
+
+      <span class="identity-cover identity-cover--professional" aria-hidden="true">
+        <img
+          src="/images/adrian-infantes-ai-security-cover.png"
+          alt=""
+          width="1122"
+          height="1402"
+          fetchpriority="high"
+          draggable="false"
+        />
+      </span>
+    </button>
+  </section>
+</section>
+
+<script>
+  const frame = document.querySelector<HTMLButtonElement>("[data-identity-frame]");
+
+  if (frame) {
+    const showOffensiveLayer = (x: number, y: number) => {
+      frame.style.setProperty("--reveal-x", `${x}px`);
+      frame.style.setProperty("--reveal-y", `${y}px`);
+      frame.dataset.revealing = "true";
+      frame.setAttribute("aria-pressed", "true");
+    };
+
+    const revealAtPointer = (event: PointerEvent) => {
+      const bounds = frame.getBoundingClientRect();
+      const x = Math.min(Math.max(event.clientX - bounds.left, 0), bounds.width);
+      const y = Math.min(Math.max(event.clientY - bounds.top, 0), bounds.height);
+
+      showOffensiveLayer(x, y);
+    };
+
+    const revealAtCenter = () => {
+      const bounds = frame.getBoundingClientRect();
+      showOffensiveLayer(bounds.width / 2, bounds.height / 2);
+    };
+
+    const concealOffensiveLayer = () => {
+      delete frame.dataset.revealing;
+      frame.setAttribute("aria-pressed", "false");
+    };
+
+    frame.addEventListener("pointerenter", revealAtPointer);
+    frame.addEventListener("pointermove", revealAtPointer);
+    frame.addEventListener("pointerdown", revealAtPointer);
+    frame.addEventListener("pointerleave", concealOffensiveLayer);
+    frame.addEventListener("pointercancel", concealOffensiveLayer);
+    frame.addEventListener("focus", () => {
+      if (frame.matches(":focus-visible")) {
+        revealAtCenter();
+      }
+    });
+    frame.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        revealAtCenter();
+      }
+    });
+    frame.addEventListener("pointerup", (event) => {
+      if (event.pointerType === "touch") {
+        concealOffensiveLayer();
+      }
+    });
+    frame.addEventListener("blur", concealOffensiveLayer);
+  }
+</script>

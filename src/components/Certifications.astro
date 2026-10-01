@@ -1,0 +1,29 @@
+---
+const certifications = [
+  {
+    title: "HTB Certified Offensive AI Expert (COAE)",
+    issuer: "Hack The Box",
+  },
+  {
+    title: "AWS Certified Generative AI Developer – Professional",
+    issuer: "Amazon Web Services",
+  },
+  {
+    title: "AWS Certified Security – Specialty",
+    issuer: "Amazon Web Services",
+  },
+];
+---
+
+<section class="certifications" aria-labelledby="certifications-title">
+  <h2 id="certifications-title">Certifications</h2>
+  <ul class="certification-grid" role="list">
+    {certifications.map((certification) => (
+      <li class="certification">
+        <h3>{certification.title}</h3>
+        <p class="certification-issuer">{certification.issuer}</p>
+        <p class="certification-status">Completed</p>
+      </li>
+    ))}
+  </ul>
+</section>
