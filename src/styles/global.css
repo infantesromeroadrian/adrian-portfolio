@@ -747,3 +747,465 @@ a:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
+
+:is(
+  #intro-title,
+  #about-title,
+  #medium-title,
+  #experience,
+  #education,
+  #certifications-title,
+  #htb-title
+) {
+  scroll-margin-top: 6rem;
+}
+
+.site-navigation [hidden],
+.portfolio-chat [hidden] {
+  display: none !important;
+}
+
+.site-navigation__toggle {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 110;
+  display: grid;
+  grid-template-columns: 1.25rem auto;
+  gap: 0.55rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #111417;
+  border-radius: 0;
+  background: #ebe8e1;
+  color: #111417;
+  font: inherit;
+  cursor: pointer;
+}
+
+.site-navigation__toggle-lines {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.site-navigation__toggle-lines span {
+  display: block;
+  width: 1.25rem;
+  height: 1px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.site-navigation__toggle[aria-expanded="true"] .site-navigation__toggle-lines span:first-child {
+  transform: translateY(0.165rem) rotate(45deg);
+}
+
+.site-navigation__toggle[aria-expanded="true"] .site-navigation__toggle-lines span:last-child {
+  transform: translateY(-0.165rem) rotate(-45deg);
+}
+
+.site-navigation__toggle-label {
+  font-size: 0.78rem;
+}
+
+.site-navigation__panel {
+  position: fixed;
+  top: calc(max(1rem, env(safe-area-inset-top)) + 3.35rem);
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 105;
+  width: min(22rem, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border: 1px solid #111417;
+  background: #ebe8e1;
+  box-shadow: 0.6rem 0.6rem 0 #111417;
+}
+
+.site-navigation__heading {
+  margin: 0 0 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid #81817c;
+  color: #525b60;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: 1rem;
+}
+
+.site-navigation__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-navigation__list a {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: baseline;
+  min-height: 2.75rem;
+  padding-block: 0.55rem;
+  border-bottom: 1px solid #b5b4ad;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  text-decoration: none;
+}
+
+.site-navigation__list a span {
+  color: #525b60;
+  font-family: "Aptos", "Segoe UI", Arial, sans-serif;
+  font-size: 0.68rem;
+}
+
+.site-navigation__list a:hover {
+  padding-left: 0.35rem;
+}
+
+.site-navigation__fallback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+  margin: 1rem auto;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #b5b4ad;
+  font-size: 0.85rem;
+}
+
+.portfolio-chat {
+  --chat-edge: max(1rem, env(safe-area-inset-right));
+  --chat-bottom: max(1.75rem, calc(env(safe-area-inset-bottom) + 1rem));
+
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.portfolio-chat button,
+.portfolio-chat textarea {
+  font: inherit;
+}
+
+.portfolio-chat__toggle {
+  position: fixed;
+  right: var(--chat-edge);
+  bottom: var(--chat-bottom);
+  z-index: 90;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 1px solid #111417;
+  border-radius: 50%;
+  background: #090a0b;
+  color: #fff;
+  box-shadow: 0 0 0 4px #ebe8e1;
+  cursor: pointer;
+}
+
+.portfolio-chat__toggle canvas,
+.portfolio-chat__fallback {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 72px;
+  height: 72px;
+  pointer-events: none;
+}
+
+.portfolio-chat__fallback {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.7;
+}
+
+.portfolio-chat__fallback g {
+  fill: #fff;
+  stroke: none;
+}
+
+.portfolio-chat__toggle[data-canvas-ready="true"] .portfolio-chat__fallback {
+  display: none;
+}
+
+.portfolio-chat__toggle-close {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  display: none;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.portfolio-chat__toggle[aria-expanded="true"] :is(canvas, .portfolio-chat__fallback) {
+  opacity: 0.18;
+}
+
+.portfolio-chat__toggle[aria-expanded="true"] .portfolio-chat__toggle-close {
+  display: block;
+}
+
+.portfolio-chat__toggle-label {
+  position: absolute;
+  right: 0;
+  bottom: -1.2rem;
+  left: 0;
+  color: #111417;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.portfolio-chat__panel {
+  position: fixed;
+  right: var(--chat-edge);
+  bottom: calc(var(--chat-bottom) + 6rem);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: min(42rem, calc(100dvh - 7.5rem - env(safe-area-inset-top)));
+  overflow: hidden;
+  border: 1px solid #111417;
+  background: #ebe8e1;
+  color: #111417;
+  box-shadow: 0.6rem 0.6rem 0 #111417;
+}
+
+.portfolio-chat__header {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border-bottom: 1px solid #81817c;
+}
+
+.portfolio-chat__eyebrow {
+  margin: 0 0 0.2rem;
+  color: #525b60;
+  font-size: 0.7rem;
+}
+
+.portfolio-chat__header h2 {
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.portfolio-chat__close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid #81817c;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.portfolio-chat__close svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.portfolio-chat__body {
+  flex: 1 1 auto;
+  min-height: 5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+  scrollbar-gutter: stable;
+}
+
+.portfolio-chat__notice {
+  margin: 0;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid #b5b4ad;
+  color: #333a3e;
+  font-size: 0.75rem;
+}
+
+.portfolio-chat__status {
+  margin: 0.85rem 0 0;
+  color: #525b60;
+  font-size: 0.78rem;
+}
+
+.portfolio-chat__messages {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.portfolio-chat__messages:empty {
+  display: none;
+}
+
+.portfolio-chat__messages article {
+  padding: 0.75rem;
+  border: 1px solid #81817c;
+  background: #f5f2eb;
+}
+
+.portfolio-chat__messages article[data-role="user"] {
+  margin-left: 1.5rem;
+  background: #111417;
+  color: #f5f2eb;
+}
+
+.portfolio-chat__messages h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.portfolio-chat__messages p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+}
+
+.portfolio-chat__error {
+  margin: 0.85rem 0 0;
+  padding-left: 0.65rem;
+  border-left: 3px solid #111417;
+  font-size: 0.78rem;
+}
+
+.portfolio-chat__form {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem 0.75rem;
+  border-top: 1px solid #81817c;
+}
+
+.portfolio-chat__form label {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.portfolio-chat__form textarea {
+  width: 100%;
+  min-height: 3.5rem;
+  max-height: 8rem;
+  resize: vertical;
+  border: 1px solid #81817c;
+  border-radius: 0;
+  padding: 0.65rem;
+  background: #f5f2eb;
+  color: #111417;
+  font-size: 16px;
+}
+
+.portfolio-chat__form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.portfolio-chat__form-actions span {
+  color: #525b60;
+  font-size: 0.7rem;
+}
+
+.portfolio-chat__form-actions button {
+  min-width: 5.25rem;
+  min-height: 2.75rem;
+  border: 1px solid #111417;
+  border-radius: 0;
+  background: #111417;
+  color: #f5f2eb;
+  cursor: pointer;
+}
+
+.portfolio-chat__form :disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.portfolio-chat__pause {
+  justify-self: start;
+  min-height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #525b60;
+  font-size: 0.7rem !important;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+
+.portfolio-chat__noscript {
+  width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+  margin: 0 auto 2rem;
+  color: #525b60;
+  font-size: 0.8rem;
+}
+
+:is(
+  .site-navigation__toggle,
+  .site-navigation__list a,
+  .portfolio-chat__toggle,
+  .portfolio-chat__close,
+  .portfolio-chat__form textarea,
+  .portfolio-chat__form button
+):focus-visible {
+  outline: 3px solid #111417;
+  outline-offset: 4px;
+}
+
+.portfolio-chat__toggle:focus-visible {
+  outline-color: #fff;
+  outline-offset: -6px;
+}
+
+@media (max-width: 35rem) {
+  .site-navigation__toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .site-navigation__toggle {
+    grid-template-columns: 1.25rem;
+  }
+
+  .portfolio-chat__panel {
+    right: max(0.75rem, env(safe-area-inset-right));
+    width: calc(100vw - 1.5rem);
+    max-height: calc(100dvh - 7.25rem - env(safe-area-inset-top));
+  }
+
+  .portfolio-chat__messages article[data-role="user"] {
+    margin-left: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-navigation__toggle-lines span,
+  .portfolio-chat__panel {
+    transition: none;
+  }
+}

@@ -1,0 +1,100 @@
+<aside class="portfolio-chat" data-portfolio-chat>
+  <section
+    class="portfolio-chat__panel"
+    id="portfolio-chat-panel"
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby="portfolio-chat-title"
+    aria-describedby="portfolio-chat-notice"
+    aria-busy="false"
+    hidden
+    data-chat-panel
+  >
+    <header class="portfolio-chat__header">
+      <div>
+        <p class="portfolio-chat__eyebrow">Portfolio assistant</p>
+        <h2 id="portfolio-chat-title">Ask about the work</h2>
+      </div>
+      <button class="portfolio-chat__close" type="button" aria-label="Close AI assistant" data-chat-close>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div class="portfolio-chat__body" data-chat-body>
+      <p class="portfolio-chat__notice" id="portfolio-chat-notice">
+        AI assistant. Answers come from public portfolio information and may be wrong.
+        This conversation is not persisted.
+      </p>
+      <p class="portfolio-chat__status" role="status" aria-live="polite" data-chat-status>
+        Checking availability…
+      </p>
+      <div
+        class="portfolio-chat__messages"
+        role="log"
+        aria-label="Conversation with the portfolio assistant"
+        aria-live="polite"
+        aria-relevant="additions"
+        data-chat-messages
+      ></div>
+      <p class="portfolio-chat__error" aria-live="polite" hidden data-chat-error></p>
+    </div>
+
+    <form class="portfolio-chat__form" data-chat-form>
+      <label for="portfolio-chat-message">Your message</label>
+      <textarea
+        id="portfolio-chat-message"
+        name="message"
+        rows="2"
+        maxlength="2000"
+        placeholder="Ask about this portfolio"
+        autocomplete="off"
+        disabled
+        data-chat-input
+      ></textarea>
+      <div class="portfolio-chat__form-actions">
+        <span aria-live="polite" data-chat-count>0 / 2000</span>
+        <button type="submit" disabled data-chat-submit>Send</button>
+      </div>
+      <button class="portfolio-chat__pause" type="button" aria-pressed="false" data-orb-pause>
+        Pause orb motion
+      </button>
+    </form>
+  </section>
+
+  <button
+    class="portfolio-chat__toggle"
+    type="button"
+    aria-label="Open AI portfolio assistant"
+    aria-controls="portfolio-chat-panel"
+    aria-expanded="false"
+    data-chat-toggle
+  >
+    <svg class="portfolio-chat__fallback" viewBox="0 0 72 72" aria-hidden="true">
+      <circle cx="36" cy="36" r="27"></circle>
+      <path d="M36 9l21 14v26L36 63 15 49V23zM15 23l42 26M15 49l42-26M36 9v54"></path>
+      <g>
+        <circle cx="36" cy="9" r="1.75"></circle>
+        <circle cx="15" cy="23" r="1.75"></circle>
+        <circle cx="57" cy="49" r="1.75"></circle>
+        <circle cx="36" cy="63" r="1.75"></circle>
+      </g>
+    </svg>
+    <canvas width="72" height="72" aria-hidden="true" data-orb-canvas></canvas>
+    <svg class="portfolio-chat__toggle-close" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18"></path>
+    </svg>
+    <span class="portfolio-chat__toggle-label">Ask AI</span>
+  </button>
+
+  <noscript>
+    <p class="portfolio-chat__noscript">
+      The AI assistant needs JavaScript. The portfolio itself remains available above.
+    </p>
+  </noscript>
+</aside>
+
+<script>
+  import "../scripts/chat-widget";
+</script>

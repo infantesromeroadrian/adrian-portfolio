@@ -1,0 +1,61 @@
+---
+const destinations = [
+  { label: "Intro", href: "#intro-title" },
+  { label: "About", href: "#about-title" },
+  { label: "Writing", href: "#medium-title" },
+  { label: "Experience", href: "#experience" },
+  { label: "Education", href: "#education" },
+  { label: "Certifications", href: "#certifications-title" },
+  { label: "Hack The Box", href: "#htb-title" },
+] as const;
+---
+
+<div class="site-navigation" data-site-navigation>
+  <button
+    class="site-navigation__toggle"
+    type="button"
+    aria-label="Open site navigation"
+    aria-controls="site-navigation-panel"
+    aria-expanded="false"
+    hidden
+    data-site-navigation-toggle
+  >
+    <span class="site-navigation__toggle-lines" aria-hidden="true">
+      <span></span>
+      <span></span>
+    </span>
+    <span class="site-navigation__toggle-label">Menu</span>
+  </button>
+
+  <nav
+    class="site-navigation__panel"
+    id="site-navigation-panel"
+    aria-label="Portfolio sections"
+    hidden
+    data-site-navigation-panel
+  >
+    <p class="site-navigation__heading">Index</p>
+    <ol class="site-navigation__list">
+      {destinations.map((destination, index) => (
+        <li>
+          <a href={destination.href}>
+            <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+            {destination.label}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <noscript>
+    <nav class="site-navigation__fallback" aria-label="Portfolio sections">
+      {destinations.map((destination) => (
+        <a href={destination.href}>{destination.label}</a>
+      ))}
+    </nav>
+  </noscript>
+</div>
+
+<script>
+  import "../scripts/site-navigation";
+</script>

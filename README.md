@@ -39,12 +39,31 @@ npm run dev
 
 El servidor de desarrollo usa `http://localhost:4321` por defecto.
 
+El chat sigue este flujo: navegador → `/api/chat` → Ollama Cloud. La página se
+prerenderiza como HTML estático y solo el endpoint se ejecuta bajo demanda con
+el adaptador de Vercel. Configura las variables del servidor a partir de
+`.env.example`:
+
+- `OLLAMA_API_KEY` es obligatoria para habilitar el chat.
+- `OLLAMA_MODEL` es opcional y ya incluye el modelo predeterminado en el ejemplo.
+
+La API acepta únicamente JSON y conversaciones de hasta ocho mensajes, con un
+máximo de 2.000 caracteres por mensaje y 32 KiB por petición. Valida origen y
+metadatos `Sec-Fetch-Site`, aplica un timeout de 12 segundos, limita la respuesta
+del proveedor a 64 KiB y entrega como máximo 4.000 caracteres. Las respuestas no
+se almacenan en caché y los errores públicos no incluyen datos del proveedor.
+
+El endpoint no incorpora rate limiting distribuido. Los límites anteriores
+acotan cada petición, pero un despliegue público necesitará una protección
+compartida en el borde si aparece abuso sostenido entre varias instancias.
+
 ## Comprobación
 
 ```sh
 npm run build
 ```
 
-El proyecto es estático y no depende de fuentes, imágenes ni scripts remotos en
+La página principal no depende de fuentes, imágenes ni scripts remotos en
 runtime. Las dos portadas viven en `public/images/` con las mismas dimensiones
-para conservar su alineación durante el revelado.
+para conservar su alineación durante el revelado. El chat sí depende de Ollama
+Cloud a través del endpoint server-only; la clave nunca se envía al navegador.
