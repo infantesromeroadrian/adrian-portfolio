@@ -1,8 +1,17 @@
 ---
-const certifications = [
+type Certification = {
+  title: string;
+  issuer: string;
+  credentialId?: string;
+  verificationUrl?: string;
+};
+
+const certifications: readonly Certification[] = [
   {
     title: "HTB Certified Offensive AI Expert (COAE)",
     issuer: "Hack The Box",
+    credentialId: "HTBCERT-1287C8C6C3",
+    verificationUrl: "https://www.hackthebox.com/certificates",
   },
   {
     title: "AWS Certified Generative AI Developer – Professional",
@@ -22,6 +31,20 @@ const certifications = [
       <li class="certification">
         <h3>{certification.title}</h3>
         <p class="certification-issuer">{certification.issuer}</p>
+        {certification.credentialId && (
+          <p class="certification-credential">Credential ID: {certification.credentialId}</p>
+        )}
+        {certification.verificationUrl && (
+          <a
+            class="certification-link"
+            href={certification.verificationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Verify ${certification.title} credential (opens in a new tab)`}
+          >
+            Verify credential <span aria-hidden="true">↗</span>
+          </a>
+        )}
         <p class="certification-status">Completed</p>
       </li>
     ))}

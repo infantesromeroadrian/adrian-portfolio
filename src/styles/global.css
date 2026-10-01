@@ -123,6 +123,10 @@ a {
   border-top: 1px solid #81817c;
 }
 
+.editorial-footer--touch {
+  display: none;
+}
+
 .reveal-instruction {
   max-width: 21rem;
   margin: 0;
@@ -225,11 +229,11 @@ a {
     cursor: pointer;
   }
 
-  .reveal-instruction--pointer {
-    display: none;
+  .reveal-instruction--touch {
+    display: block;
   }
 
-  .reveal-instruction--touch {
+  .editorial-footer--touch {
     display: block;
   }
 }
@@ -552,8 +556,8 @@ a:focus-visible {
 }
 
 .certification {
-  display: grid;
-  grid-template-rows: 1fr auto auto;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   padding-top: 1.25rem;
   border-top: 1px solid #b5b4ad;
@@ -575,8 +579,29 @@ a:focus-visible {
   line-height: 1.5;
 }
 
+.certification-credential {
+  margin: 0.6rem 0 0;
+  color: #525b60;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.certification-link {
+  align-self: flex-start;
+  min-height: 2.75rem;
+  margin-top: 0.35rem;
+  padding-block: 0.65rem;
+  color: #4a7184;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+}
+
 .certification-status {
-  margin: 0.75rem 0 0;
+  margin: auto 0 0;
+  padding-top: 0.75rem;
   color: #4a7184;
   font-size: 0.85rem;
   font-weight: 700;
@@ -593,7 +618,7 @@ a:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: clamp(2rem, 5vw, 4.5rem);
-  align-items: end;
+  align-items: center;
   width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
   margin-inline: auto;
   padding-block: clamp(3rem, 5vw, 4.5rem);
@@ -608,22 +633,18 @@ a:focus-visible {
 }
 
 .htb-heading h2 {
-  max-width: 10ch;
+  max-width: 12ch;
   margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(3rem, 6.4vw, 6rem);
+  font-size: clamp(2.8rem, 5.4vw, 5.25rem);
   font-weight: 500;
   line-height: 0.95;
   letter-spacing: -0.055em;
   text-wrap: balance;
 }
 
-.htb-profile {
-  min-width: 0;
-}
-
 .htb-alias {
-  margin: 0 0 1.25rem;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 1rem;
   color: #4a7184;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
   font-size: clamp(2rem, 3.5vw, 3rem);
@@ -648,6 +669,19 @@ a:focus-visible {
   text-underline-offset: 0.3em;
 }
 
+.htb-badge-link {
+  display: block;
+  min-width: 0;
+  border: 1px solid #81817c;
+  background: #111417;
+}
+
+.htb-badge-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 @media (max-width: 47.5rem) {
   .htb-highlight {
     grid-template-columns: minmax(0, 1fr);
@@ -670,10 +704,12 @@ a:focus-visible {
 }
 
 .medium-brand {
+  display: block;
+  width: 2.5rem;
+  height: auto;
   margin: 0 0 0.3rem;
   color: #525b60;
-  font-size: 0.78rem;
-  font-weight: 700;
+  fill: currentColor;
 }
 
 .medium-highlight h2 {
@@ -965,7 +1001,7 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   width: min(26rem, calc(100vw - 2rem));
-  max-height: min(42rem, calc(100dvh - 7.5rem - env(safe-area-inset-top)));
+  max-height: min(42rem, calc(100dvh - 8.5rem - env(safe-area-inset-top)));
   overflow: hidden;
   border: 1px solid #111417;
   background: #ebe8e1;
@@ -1195,7 +1231,7 @@ a:focus-visible {
   .portfolio-chat__panel {
     right: max(0.75rem, env(safe-area-inset-right));
     width: calc(100vw - 1.5rem);
-    max-height: calc(100dvh - 7.25rem - env(safe-area-inset-top));
+    max-height: calc(100dvh - 8.5rem - env(safe-area-inset-top));
   }
 
   .portfolio-chat__messages article[data-role="user"] {

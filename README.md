@@ -20,15 +20,16 @@ reduced-motion los ejes se muestran completos y los engranajes no giran.
 
 Certifications aparece a continuación con tres credenciales completadas en una
 retícula editorial: tres columnas en escritorio y tablet, y una en móvil
-estrecho. El contenido es estático y no publica fechas ni enlaces.
+estrecho. COAE publica su identificador y un enlace seguro a la página de
+verificación de Hack The Box; las certificaciones no publican fechas.
 
-El bloque Hack The Box continúa con el alias L4tentNoise, el titular Global Top 100
-y un enlace al perfil que abre en una pestaña nueva. Usa HTML estático y conserva
-el foco visible del sitio.
+Awards continúa con el alias L4tentNoise, el titular Hack The Box Global Top 100,
+una copia local del badge enlazada al reconocimiento oficial y un enlace secundario
+al perfil. Ambos destinos abren en una pestaña nueva y conservan el foco visible.
 
 Debajo de la portada de la intro aparece una pieza editorial compacta de Medium
-con acceso directo a `@infantesromeroadrian`. El enlace abre el perfil en una
-pestaña nueva y el contenido sigue siendo legible sin JavaScript.
+con su marca monocroma inline y acceso directo a `@infantesromeroadrian`. El enlace
+abre el perfil en una pestaña nueva y el contenido sigue siendo legible sin JavaScript.
 
 ## Desarrollo local
 
@@ -64,6 +65,7 @@ npm run build
 ```
 
 La página principal no depende de fuentes, imágenes ni scripts remotos en
-runtime. Las dos portadas viven en `public/images/` con las mismas dimensiones
-para conservar su alineación durante el revelado. El chat sí depende de Ollama
-Cloud a través del endpoint server-only; la clave nunca se envía al navegador.
+runtime. Las dos portadas y el badge de Hack The Box viven en `public/images/`;
+las portadas comparten dimensiones para conservar su alineación durante el
+revelado. El chat sí depende de Ollama Cloud a través del endpoint server-only;
+la clave nunca se envía al navegador.
