@@ -29,7 +29,9 @@ al perfil. Ambos destinos abren en una pestaña nueva y conservan el foco visibl
 
 Debajo de la portada de la intro aparece una pieza editorial compacta de Medium
 con su marca monocroma inline y acceso directo a `@infantesromeroadrian`. El enlace
-abre el perfil en una pestaña nueva y el contenido sigue siendo legible sin JavaScript.
+abre el perfil en una pestaña nueva. Debajo, una fila de enlaces con icono y texto
+conecta los perfiles públicos de LinkedIn, GitHub y X. Todo el contenido sigue
+siendo legible sin JavaScript.
 
 ## Desarrollo local
 

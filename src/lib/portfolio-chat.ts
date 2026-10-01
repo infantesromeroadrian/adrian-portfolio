@@ -1,5 +1,15 @@
 const OLLAMA_CHAT_URL = "https://ollama.com/api/chat";
 const DEFAULT_OLLAMA_MODEL = "mistral-large-3:675b";
+const COAE_CERTIFICATION_NAME = "HTB Certified Offensive AI Expert (COAE)";
+const COAE_CREDENTIAL_ID = "HTBCERT-1287C8C6C3";
+const COAE_VERIFICATION_URL = "https://www.hackthebox.com/certificates";
+
+const COAE_RESPONSE = [
+  COAE_CERTIFICATION_NAME,
+  `Credential ID: ${COAE_CREDENTIAL_ID}`,
+  `Verification URL: ${COAE_VERIFICATION_URL}`,
+  "Use the Credential ID and Verification URL separately; no individual credential URL is published.",
+].join("\n");
 
 const MAX_REQUEST_BYTES = 32 * 1024;
 const MAX_PROVIDER_RESPONSE_BYTES = 64 * 1024;
@@ -20,7 +30,7 @@ Use only these public facts:
 - UNED Bachelor's Degree in Artificial Intelligence Engineering.
 - MIOTI Big Data & Data Science Master.
 - MIOTI Master in ML & DL.
-- HTB Certified Offensive AI Expert (COAE): completed. Public credential ID (separate value): HTBCERT-1287C8C6C3. Generic validator (the only verified validation URL): https://www.hackthebox.com/certificates. No individual credential URL is published in this portfolio; use the generic validator exactly as written and the credential ID separately.
+- ${COAE_CERTIFICATION_NAME}: completed. Public credential ID (separate value): ${COAE_CREDENTIAL_ID}. Generic validator (the only verified validation URL): ${COAE_VERIFICATION_URL}. No individual credential URL is published in this portfolio; use the generic validator exactly as written and the credential ID separately.
 - AWS Certified Generative AI Developer – Professional: completed.
 - AWS Certified Security – Specialty: completed.
 - Hack The Box L4tentNoise earned the Global Top 100 badge on 30 Sep 2026. Official badge: https://labs.hackthebox.com/achievement/badge/preview/2822044/21.png
@@ -227,6 +237,19 @@ function parseMessages(value: unknown): readonly ChatMessage[] {
   return messages;
 }
 
+function exactCertificationResponse(messages: readonly ChatMessage[]): string | undefined {
+  const finalMessage = messages.at(-1);
+  if (finalMessage?.role !== "user") {
+    return undefined;
+  }
+
+  const asksAboutCoae =
+    /\bCOAE\b/i.test(finalMessage.content) ||
+    /\bcertified\s+offensive\s+ai\s+expert\b/i.test(finalMessage.content);
+
+  return asksAboutCoae ? COAE_RESPONSE : undefined;
+}
+
 async function parseRequestMessages(request: Request): Promise<readonly ChatMessage[]> {
   const contentLength = request.headers.get("Content-Length");
   if (contentLength && /^\d+$/.test(contentLength) && Number(contentLength) > MAX_REQUEST_BYTES) {
@@ -366,6 +389,11 @@ export async function handleChatRequest(
     }
 
     const messages = await parseRequestMessages(request);
+    const exactResponse = exactCertificationResponse(messages);
+    if (exactResponse) {
+      return jsonResponse({ message: exactResponse });
+    }
+
     const model = environment.OLLAMA_MODEL?.trim() || DEFAULT_OLLAMA_MODEL;
     const message = await requestOllama(
       messages,
