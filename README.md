@@ -26,9 +26,9 @@ El bloque Hack The Box continúa con el alias L4tentNoise, el titular Global Top
 y un enlace al perfil que abre en una pestaña nueva. Usa HTML estático y conserva
 el foco visible del sitio.
 
-Después aparece una franja editorial de Medium con el acceso directo a
-`@infantesromeroadrian`. El enlace abre el perfil en una pestaña nueva y el
-contenido sigue siendo legible sin JavaScript.
+Debajo de la portada de la intro aparece una pieza editorial compacta de Medium
+con acceso directo a `@infantesromeroadrian`. El enlace abre el perfil en una
+pestaña nueva y el contenido sigue siendo legible sin JavaScript.
 
 ## Desarrollo local
 

@@ -137,9 +137,11 @@ a {
 
 .identity-visual {
   display: grid;
+  gap: 1.25rem;
   min-width: 0;
   padding: 0;
   background: #ebe8e1;
+  align-content: start;
   place-items: start;
 }
 
@@ -654,59 +656,55 @@ a:focus-visible {
 
 .medium-highlight {
   display: grid;
-  grid-template-columns: 7rem minmax(0, 1.2fr) minmax(20rem, 0.8fr);
-  gap: clamp(1.5rem, 4vw, 4rem);
-  align-items: start;
-  width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
-  margin-inline: auto;
-  padding-block: clamp(2.5rem, 4.5vw, 4rem);
-  border-top: 4px solid #111417;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+  width: 100%;
+  max-width: 42rem;
+  padding-top: 1rem;
+  border-top: 1px solid #81817c;
+}
+
+.medium-heading {
+  min-width: 0;
 }
 
 .medium-brand {
-  margin: 0;
-  color: #111417;
-  font-size: 1rem;
+  margin: 0 0 0.3rem;
+  color: #525b60;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
 .medium-highlight h2 {
-  max-width: 12ch;
   margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(2.75rem, 5.4vw, 5.25rem);
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
   font-weight: 500;
-  line-height: 0.92;
-  letter-spacing: -0.055em;
-  text-wrap: balance;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 
 .medium-profile-link {
-  display: grid;
-  gap: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
   min-width: 0;
-  min-height: 100%;
-  padding-left: clamp(1.25rem, 2.5vw, 2.25rem);
-  border-left: 1px solid #81817c;
   color: #4a7184;
   text-decoration: none;
 }
 
 .medium-handle {
   overflow-wrap: anywhere;
-  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(1.25rem, 1.8vw, 1.65rem);
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .medium-link-action {
-  align-self: end;
-  width: fit-content;
   padding-bottom: 0.35rem;
   border-bottom: 1px solid currentColor;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 0.78rem;
+  line-height: 1.35;
 }
 
 .medium-profile-link:hover .medium-link-action {
@@ -717,18 +715,13 @@ a:focus-visible {
 @media (max-width: 60rem) {
   .medium-highlight {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.5rem;
-  }
-
-  .medium-highlight h2 {
-    max-width: 10ch;
+    gap: 0.65rem;
   }
 
   .medium-profile-link {
-    min-height: 0;
-    padding: 1.5rem 0 0;
-    border-top: 1px solid #81817c;
-    border-left: 0;
+    display: grid;
+    gap: 0.35rem;
+    justify-items: start;
   }
 }
 
