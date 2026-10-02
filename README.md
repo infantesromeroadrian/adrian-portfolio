@@ -13,6 +13,13 @@ con encabezados alineados y un divisor central, también a 768 px. Por debajo de
 Experience muestra periodos profesionales. Education conserva el orden solicitado
 y no publica fechas.
 
+AWS Architect continúa como un folio editorial de tres láminas técnicas:
+guardrails como código, un runtime de agente protegido y operaciones guiadas por
+evidencia. Cada caso combina una descripción breve, su alcance técnico y una
+miniatura WebP enlazada al mapa Archify interactivo completo en `/architecture/`.
+La galería muestra tres columnas en pantallas amplias, dos en tablet y una en
+móvil, evitando que los mapas ocupen la página a tamaño completo.
+
 Cada mecanismo combina una rueda principal y una satélite que giran en sentidos
 opuestos al alcanzar el hito. Los dos ejes avanzan de manera independiente con
 scroll nativo. Todo el contenido permanece visible sin JavaScript; con

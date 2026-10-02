@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Protected agent runtime",
+    "locale": "en",
+    "visual_preset": "editorial",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      680
+    ]
+  },
+  "components": [
+    {
+      "id": "trustedChannel",
+      "type": "external",
+      "label": "Trusted channel",
+      "sublabel": "Web, messaging or API",
+      "pos": [30, 210],
+      "size": [160, 68]
+    },
+    {
+      "id": "runtimeHost",
+      "type": "backend",
+      "label": "Agent runtime",
+      "sublabel": "Identity + request contract",
+      "pos": [240, 210],
+      "size": [170, 68]
+    },
+    {
+      "id": "inputBoundary",
+      "type": "security",
+      "label": "Input boundary",
+      "sublabel": "ApplyGuardrail",
+      "tag": "fail closed",
+      "pos": [460, 210],
+      "size": [170, 68]
+    },
+    {
+      "id": "foundationModel",
+      "type": "cloud",
+      "label": "Foundation model",
+      "sublabel": "Amazon Bedrock",
+      "pos": [680, 210],
+      "size": [170, 68]
+    },
+    {
+      "id": "outputBoundary",
+      "type": "security",
+      "label": "Output boundary",
+      "sublabel": "ApplyGuardrail",
+      "tag": "before persistence",
+      "pos": [900, 210],
+      "size": [170, 68]
+    },
+    {
+      "id": "safeResponse",
+      "type": "external",
+      "label": "Safe response",
+      "sublabel": "Approved channel output",
+      "pos": [1120, 210],
+      "size": [140, 68]
+    },
+    {
+      "id": "toolAuthorization",
+      "type": "security",
+      "label": "Tool authorization",
+      "sublabel": "Schema + business rules",
+      "tag": "deterministic",
+      "pos": [680, 420],
+      "size": [170, 68]
+    },
+    {
+      "id": "externalSystems",
+      "type": "external",
+      "label": "External systems",
+      "sublabel": "Authorized operations only",
+      "pos": [900, 420],
+      "size": [170, 68]
+    },
+    {
+      "id": "safeTelemetry",
+      "type": "cloud",
+      "label": "Sanitized telemetry",
+      "sublabel": "Input + output decisions",
+      "tag": "no payloads",
+      "pos": [240, 420],
+      "size": [180, 68]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AWS runtime boundary",
+      "wraps": [
+        "runtimeHost",
+        "inputBoundary",
+        "foundationModel",
+        "outputBoundary",
+        "toolAuthorization",
+        "safeTelemetry"
+      ],
+      "pad": 24
+    }
+  ],
+  "connections": [
+    {
+      "id": "channelToRuntime",
+      "from": "trustedChannel",
+      "to": "runtimeHost",
+      "variant": "emphasis"
+    },
+    {
+      "id": "runtimeToInput",
+      "from": "runtimeHost",
+      "to": "inputBoundary",
+      "label": "untrusted input",
+      "variant": "security",
+      "labelAt": [435, 292]
+    },
+    {
+      "id": "inputToModel",
+      "from": "inputBoundary",
+      "to": "foundationModel",
+      "variant": "emphasis"
+    },
+    {
+      "id": "modelToOutput",
+      "from": "foundationModel",
+      "to": "outputBoundary",
+      "label": "candidate response",
+      "variant": "security",
+      "labelAt": [875, 292]
+    },
+    {
+      "id": "outputToResponse",
+      "from": "outputBoundary",
+      "to": "safeResponse",
+      "variant": "emphasis"
+    },
+    {
+      "id": "modelToToolAuth",
+      "from": "foundationModel",
+      "to": "toolAuthorization",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "toolAuthToSystems",
+      "from": "toolAuthorization",
+      "to": "externalSystems",
+      "label": "validated operation",
+      "variant": "security",
+      "labelAt": [875, 502]
+    },
+    {
+      "id": "runtimeToTelemetry",
+      "from": "runtimeHost",
+      "to": "safeTelemetry",
+      "label": "sanitized events",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [325, 365]
+    }
+  ]
+}

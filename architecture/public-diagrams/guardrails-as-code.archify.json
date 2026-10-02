@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Guardrails as code",
+    "locale": "en",
+    "visual_preset": "editorial",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      680
+    ]
+  },
+  "components": [
+    {
+      "id": "policyCatalog",
+      "type": "security",
+      "label": "Policy catalog",
+      "sublabel": "Reusable risk profiles",
+      "pos": [40, 170],
+      "size": [180, 68]
+    },
+    {
+      "id": "projectOverlay",
+      "type": "security",
+      "label": "Project overlay",
+      "sublabel": "Bounded exceptions",
+      "pos": [40, 390],
+      "size": [180, 68]
+    },
+    {
+      "id": "terraformModule",
+      "type": "backend",
+      "label": "Terraform module",
+      "sublabel": "Validated composition",
+      "tag": "policy as code",
+      "pos": [290, 280],
+      "size": [190, 72]
+    },
+    {
+      "id": "bedrockGuardrail",
+      "type": "cloud",
+      "label": "Amazon Bedrock Guardrail",
+      "sublabel": "Content + sensitive data",
+      "pos": [550, 170],
+      "size": [210, 72]
+    },
+    {
+      "id": "numberedVersion",
+      "type": "security",
+      "label": "Numbered version",
+      "sublabel": "Immutable release target",
+      "pos": [550, 390],
+      "size": [210, 72]
+    },
+    {
+      "id": "parameterContract",
+      "type": "cloud",
+      "label": "Version contract",
+      "sublabel": "AWS Systems Manager",
+      "tag": "ID + version",
+      "pos": [830, 280],
+      "size": [190, 72]
+    },
+    {
+      "id": "agentDeployment",
+      "type": "backend",
+      "label": "Agent deployment",
+      "sublabel": "CDK + least-privilege IAM",
+      "pos": [1080, 280],
+      "size": [170, 72]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AWS workload boundary",
+      "wraps": [
+        "bedrockGuardrail",
+        "numberedVersion",
+        "parameterContract",
+        "agentDeployment"
+      ],
+      "pad": 26
+    }
+  ],
+  "connections": [
+    {
+      "id": "catalogToModule",
+      "from": "policyCatalog",
+      "to": "terraformModule",
+      "label": "baseline",
+      "variant": "security"
+    },
+    {
+      "id": "overlayToModule",
+      "from": "projectOverlay",
+      "to": "terraformModule",
+      "label": "scoped delta",
+      "variant": "security"
+    },
+    {
+      "id": "moduleToGuardrail",
+      "from": "terraformModule",
+      "to": "bedrockGuardrail",
+      "label": "provision",
+      "variant": "emphasis"
+    },
+    {
+      "id": "guardrailToVersion",
+      "from": "bedrockGuardrail",
+      "to": "numberedVersion",
+      "label": "publish after evaluation",
+      "variant": "security",
+      "labelAt": [655, 256]
+    },
+    {
+      "id": "versionToContract",
+      "from": "numberedVersion",
+      "to": "parameterContract",
+      "label": "write immutable reference",
+      "variant": "emphasis"
+    },
+    {
+      "id": "contractToDeployment",
+      "from": "parameterContract",
+      "to": "agentDeployment",
+      "label": "resolve at deploy time",
+      "variant": "emphasis",
+      "labelAt": [1050, 366]
+    }
+  ]
+}

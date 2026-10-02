@@ -1,0 +1,99 @@
+---
+type ArchitecturePlate = {
+  title: string;
+  summary: string;
+  scope: string;
+  href: string;
+  preview: string;
+  previewAlt: string;
+};
+
+const architecturePlates = [
+  {
+    title: "Guardrails as code",
+    summary:
+      "Reusable policy profiles keep guardrail decisions explicit from infrastructure delivery to the runtime contract.",
+    scope: "Amazon Bedrock Guardrails, Terraform, versioned SSM contract",
+    href: "/architecture/guardrails-as-code.html",
+    preview: "/architecture/guardrails-as-code-preview.webp",
+    previewAlt:
+      "Architecture preview for reusable guardrail profiles, Terraform delivery, and a versioned SSM contract",
+  },
+  {
+    title: "Protected agent runtime",
+    summary:
+      "Input and output protection surround model invocation while tool execution remains deterministic and bounded.",
+    scope: "Amazon Bedrock, Bedrock Guardrails, IAM, deterministic tool boundary",
+    href: "/architecture/protected-agent-runtime.html",
+    preview: "/architecture/protected-agent-runtime-preview.webp",
+    previewAlt:
+      "Architecture preview for input and output protection, Bedrock invocation, and a deterministic tool boundary",
+  },
+  {
+    title: "Evidence-led operations",
+    summary:
+      "Evaluation gates and telemetry without payloads support progressive release, observable decisions, and explicit rollback.",
+    scope: "Evaluation gates, CloudWatch, progressive rollout, rollback",
+    href: "/architecture/evidence-led-operations.html",
+    preview: "/architecture/evidence-led-operations-preview.webp",
+    previewAlt:
+      "Architecture preview for evaluation gates, payload-free telemetry, progressive rollout, and rollback",
+  },
+] satisfies readonly ArchitecturePlate[];
+---
+
+<section class="aws-architect" id="aws-architect" aria-labelledby="aws-architect-title">
+  <header class="aws-architect__heading">
+    <p class="aws-architect__folio-note">Architecture folio / Plates 01–03</p>
+    <h2 id="aws-architect-title">AWS Architect</h2>
+    <p class="aws-architect__introduction">
+      Three studies in controlled, observable AI systems on AWS. Each plate opens as an interactive architecture map.
+    </p>
+  </header>
+
+  <ol class="architecture-plates" role="list">
+    {architecturePlates.map((plate, index) => (
+      <li>
+        <figure class="architecture-plate">
+          <a
+            class="architecture-plate__preview"
+            href={plate.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Explore ${plate.title} interactive architecture map (opens in a new tab)`}
+          >
+            <img
+              src={plate.preview}
+              alt={plate.previewAlt}
+              width="960"
+              height="600"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+
+          <figcaption class="architecture-plate__caption">
+            <p class="architecture-plate__number" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3>{plate.title}</h3>
+            <p class="architecture-plate__summary">{plate.summary}</p>
+            <dl class="architecture-plate__scope">
+              <dt>Technical scope</dt>
+              <dd>{plate.scope}</dd>
+            </dl>
+            <a
+              class="architecture-plate__text-link"
+              href={plate.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Explore ${plate.title} interactive architecture map (opens in a new tab)`}
+            >
+              Explore interactive map <span aria-hidden="true">↗</span>
+            </a>
+          </figcaption>
+        </figure>
+      </li>
+    ))}
+  </ol>
+</section>

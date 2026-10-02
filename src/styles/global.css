@@ -530,6 +530,193 @@ a:focus-visible {
   }
 }
 
+.aws-architect {
+  width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+  margin-inline: auto;
+  padding-block: clamp(3rem, 6vw, 5.5rem);
+  border-top: 1px solid #b5b4ad;
+}
+
+.aws-architect__heading {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.3fr);
+  gap: 1.25rem clamp(2rem, 5vw, 5rem);
+  align-items: end;
+  margin-bottom: clamp(3rem, 6vw, 5.5rem);
+}
+
+.aws-architect__folio-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #4a7184;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.aws-architect__heading h2 {
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(3rem, 6vw, 5.75rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.aws-architect__introduction {
+  max-width: 42ch;
+  margin: 0;
+  color: #333a3e;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+  line-height: 1.45;
+}
+
+.architecture-plates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 3rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.architecture-plates > li {
+  min-width: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid #b5b4ad;
+}
+
+.architecture-plate {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.architecture-plate__caption {
+  min-width: 0;
+}
+
+.architecture-plate__number {
+  margin: 0 0 0.85rem;
+  color: #4a7184;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.architecture-plate__caption h3 {
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.65rem, 2.8vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.architecture-plate__summary {
+  margin: 1rem 0 0;
+  color: #333a3e;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.architecture-plate__scope {
+  margin: 1.5rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid #b5b4ad;
+}
+
+.architecture-plate__scope dt {
+  color: #4a7184;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.architecture-plate__scope dd {
+  margin: 0.45rem 0 0;
+  color: #525b60;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.architecture-plate__text-link {
+  display: inline-block;
+  min-height: 2.75rem;
+  margin-top: 0.85rem;
+  padding-block: 0.65rem;
+  color: #4a7184;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+}
+
+.architecture-plate__preview {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #b5b4ad;
+  background: #f5f2eb;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.architecture-plate__preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.architecture-plate__preview:hover {
+  border-color: #111417;
+  transform: translateY(-0.18rem);
+}
+
+.architecture-plate__preview:focus-visible {
+  outline: 2px solid #111417;
+  outline-offset: 0.25rem;
+}
+
+@media (max-width: 47.5rem) {
+  .aws-architect__heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aws-architect__heading {
+    gap: 1rem;
+  }
+
+  .aws-architect__folio-note {
+    grid-column: auto;
+  }
+
+  .aws-architect__heading h2 {
+    font-size: clamp(3rem, 14vw, 4.75rem);
+  }
+
+  .architecture-plates {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+
+  .architecture-plate__number {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 47.501rem) and (max-width: 70rem) {
+  .architecture-plates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .certifications {
   width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
   margin-inline: auto;
@@ -825,6 +1012,7 @@ a:focus-visible {
   #medium-title,
   #experience,
   #education,
+  #aws-architect,
   #certifications-title,
   #htb-title
 ) {

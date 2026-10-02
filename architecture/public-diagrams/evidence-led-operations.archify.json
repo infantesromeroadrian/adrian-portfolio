@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Evidence-led operations",
+    "locale": "en",
+    "visual_preset": "editorial",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      680
+    ]
+  },
+  "components": [
+    {
+      "id": "policyCandidate",
+      "type": "security",
+      "label": "Policy candidate",
+      "sublabel": "Sanitized configuration",
+      "pos": [50, 150],
+      "size": [180, 68]
+    },
+    {
+      "id": "evaluationDataset",
+      "type": "database",
+      "label": "Evaluation dataset",
+      "sublabel": "Allow, block and bypass cases",
+      "pos": [320, 150],
+      "size": [190, 68]
+    },
+    {
+      "id": "approvalGate",
+      "type": "security",
+      "label": "Approval gate",
+      "sublabel": "Security + platform owners",
+      "pos": [600, 150],
+      "size": [180, 68]
+    },
+    {
+      "id": "releaseManifest",
+      "type": "database",
+      "label": "Release manifest",
+      "sublabel": "Version, evidence, predecessor",
+      "tag": "immutable identity",
+      "pos": [870, 150],
+      "size": [200, 68]
+    },
+    {
+      "id": "progressiveRollout",
+      "type": "cloud",
+      "label": "Progressive rollout",
+      "sublabel": "Target by target",
+      "pos": [880, 400],
+      "size": [190, 68]
+    },
+    {
+      "id": "runtimeEvidence",
+      "type": "backend",
+      "label": "Runtime evidence",
+      "sublabel": "Input, output and bypass smoke",
+      "pos": [600, 400],
+      "size": [200, 68]
+    },
+    {
+      "id": "metricsAndAlarms",
+      "type": "cloud",
+      "label": "Metrics and alarms",
+      "sublabel": "Latency, errors, interventions",
+      "tag": "payload free",
+      "pos": [320, 400],
+      "size": [200, 68]
+    },
+    {
+      "id": "rollbackDecision",
+      "type": "security",
+      "label": "Rollback decision",
+      "sublabel": "Restore a known version",
+      "pos": [40, 400],
+      "size": [190, 68]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Governed delivery system",
+      "wraps": [
+        "policyCandidate",
+        "evaluationDataset",
+        "approvalGate",
+        "releaseManifest",
+        "progressiveRollout",
+        "runtimeEvidence",
+        "metricsAndAlarms",
+        "rollbackDecision"
+      ],
+      "pad": 28
+    }
+  ],
+  "connections": [
+    {
+      "id": "candidateToDataset",
+      "from": "policyCandidate",
+      "to": "evaluationDataset",
+      "label": "evaluate",
+      "variant": "security"
+    },
+    {
+      "id": "datasetToApproval",
+      "from": "evaluationDataset",
+      "to": "approvalGate",
+      "label": "measured result",
+      "variant": "emphasis"
+    },
+    {
+      "id": "approvalToManifest",
+      "from": "approvalGate",
+      "to": "releaseManifest",
+      "label": "authorize exact release",
+      "variant": "security",
+      "labelAt": [825, 232]
+    },
+    {
+      "id": "manifestToRollout",
+      "from": "releaseManifest",
+      "to": "progressiveRollout",
+      "label": "activate target",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "rolloutToEvidence",
+      "from": "progressiveRollout",
+      "to": "runtimeEvidence",
+      "label": "verify behavior",
+      "variant": "emphasis"
+    },
+    {
+      "id": "evidenceToMetrics",
+      "from": "runtimeEvidence",
+      "to": "metricsAndAlarms",
+      "label": "operate",
+      "variant": "dashed"
+    },
+    {
+      "id": "metricsToRollback",
+      "from": "metricsAndAlarms",
+      "to": "rollbackDecision",
+      "label": "breach or regression",
+      "variant": "security",
+      "labelAt": [275, 482]
+    },
+    {
+      "id": "rollbackToCandidate",
+      "from": "rollbackDecision",
+      "to": "policyCandidate",
+      "label": "return to draft",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    }
+  ]
+}
