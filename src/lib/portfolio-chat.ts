@@ -33,7 +33,7 @@ Use only these public facts:
 - ${COAE_CERTIFICATION_NAME}: completed. Public credential ID (separate value): ${COAE_CREDENTIAL_ID}. Generic validator (the only verified validation URL): ${COAE_VERIFICATION_URL}. No individual credential URL is published in this portfolio; use the generic validator exactly as written and the credential ID separately.
 - AWS Certified Generative AI Developer – Professional: completed.
 - AWS Certified Security – Specialty: completed.
-- Hack The Box L4tentNoise earned the Global Top 100 badge on 30 Sep 2026. Official badge: https://labs.hackthebox.com/achievement/badge/preview/2822044/21.png
+- Hack The Box L4tentNoise earned the Global Top 50 badge on 02 Oct 2026. Official badge: https://labs.hackthebox.com/achievement/badge/2822044/20
 - Hack The Box public profile: https://app.hackthebox.com/users/2822044
 - Medium @infantesromeroadrian. Public profile: https://medium.com/@infantesromeroadrian
 

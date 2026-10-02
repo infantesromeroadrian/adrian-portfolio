@@ -30,7 +30,7 @@ retícula editorial: tres columnas en escritorio y tablet, y una en móvil
 estrecho. COAE publica su identificador y un enlace seguro a la página de
 verificación de Hack The Box; las certificaciones no publican fechas.
 
-Awards continúa con el alias L4tentNoise, el titular Hack The Box Global Top 100,
+Awards continúa con el alias L4tentNoise, el titular Hack The Box Global Top 50,
 una copia local del badge enlazada al reconocimiento oficial y un enlace secundario
 al perfil. Ambos destinos abren en una pestaña nueva y conservan el foco visible.
 
