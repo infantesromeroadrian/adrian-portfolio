@@ -1,7 +1,28 @@
+---
+type HackTheBoxBadge = Readonly<{
+  title: string;
+  href: string;
+  image: string;
+}>;
+
+const badges = [
+  {
+    title: "Global Top 10",
+    href: "https://labs.hackthebox.com/achievement/badge/2822044/2",
+    image: "/images/htb-top-10-badge.png",
+  },
+  {
+    title: "Global Top 50",
+    href: "https://labs.hackthebox.com/achievement/badge/2822044/20",
+    image: "/images/htb-top-50-badge.png",
+  },
+] satisfies readonly HackTheBoxBadge[];
+---
+
 <section class="htb-highlight" aria-labelledby="htb-title">
   <header class="htb-heading">
     <p class="htb-brand">Awards</p>
-    <h2 id="htb-title">Hack The Box Global Top 50</h2>
+    <h2 id="htb-title">Hack The Box Global Top 10</h2>
     <p class="htb-alias">L4tentNoise</p>
     <a
       class="htb-profile-link"
@@ -13,19 +34,25 @@
       View Hack The Box profile <span aria-hidden="true">↗</span>
     </a>
   </header>
-  <a
-    class="htb-badge-link"
-    href="https://labs.hackthebox.com/achievement/badge/2822044/20"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="View the L4tentNoise Hack The Box Global Top 50 achievement badge (opens in a new tab)"
-  >
-    <img
-      src="/images/htb-top-50-badge.png"
-      alt="Hack The Box Global Top 50 achievement badge for L4tentNoise"
-      width="700"
-      height="360"
-      loading="lazy"
-    />
-  </a>
+  <ul class="htb-badges" role="list">
+    {badges.map((badge) => (
+      <li>
+        <a
+          class="htb-badge-link"
+          href={badge.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`View the L4tentNoise Hack The Box ${badge.title} achievement badge (opens in a new tab)`}
+        >
+          <img
+            src={badge.image}
+            alt={`Hack The Box ${badge.title} achievement badge for L4tentNoise`}
+            width="700"
+            height="360"
+            loading="lazy"
+          />
+        </a>
+      </li>
+    ))}
+  </ul>
 </section>
