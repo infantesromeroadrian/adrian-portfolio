@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Guarded RAG copilot",
+    "locale": "en",
+    "visual_preset": "editorial",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      680
+    ]
+  },
+  "components": [
+    {
+      "id": "caller",
+      "type": "external",
+      "label": "Caller",
+      "sublabel": "Inbound contact",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        150,
+        68
+      ]
+    },
+    {
+      "id": "preOperator",
+      "type": "backend",
+      "label": "Intake agent",
+      "sublabel": "Prepares the case",
+      "tag": "AgentCore",
+      "pos": [
+        280,
+        298
+      ],
+      "size": [
+        180,
+        72
+      ]
+    },
+    {
+      "id": "caseSystems",
+      "type": "external",
+      "label": "Case systems",
+      "sublabel": "Account context",
+      "pos": [
+        40,
+        500
+      ],
+      "size": [
+        150,
+        68
+      ]
+    },
+    {
+      "id": "caseMemory",
+      "type": "database",
+      "label": "Case memory",
+      "sublabel": "AgentCore Memory",
+      "pos": [
+        550,
+        300
+      ],
+      "size": [
+        170,
+        68
+      ]
+    },
+    {
+      "id": "copilot",
+      "type": "backend",
+      "label": "Copilot agent",
+      "sublabel": "Suggests next steps",
+      "tag": "AgentCore",
+      "pos": [
+        810,
+        298
+      ],
+      "size": [
+        180,
+        72
+      ]
+    },
+    {
+      "id": "knowledgeBase",
+      "type": "database",
+      "label": "Knowledge base",
+      "sublabel": "Indexed manuals",
+      "pos": [
+        550,
+        500
+      ],
+      "size": [
+        170,
+        68
+      ]
+    },
+    {
+      "id": "outputGuardrail",
+      "type": "security",
+      "label": "Output guardrail",
+      "sublabel": "Amazon Bedrock Guardrails",
+      "pos": [
+        1070,
+        110
+      ],
+      "size": [
+        180,
+        68
+      ]
+    },
+    {
+      "id": "eventBus",
+      "type": "messagebus",
+      "label": "Event bus",
+      "sublabel": "Kafka topics",
+      "pos": [
+        1070,
+        500
+      ],
+      "size": [
+        180,
+        68
+      ]
+    },
+    {
+      "id": "operatorDesk",
+      "type": "frontend",
+      "label": "Operator desk",
+      "sublabel": "Human decides",
+      "pos": [
+        1070,
+        300
+      ],
+      "size": [
+        180,
+        68
+      ]
+    },
+    {
+      "id": "redactedTracing",
+      "type": "cloud",
+      "label": "Redacted tracing",
+      "sublabel": "Langfuse, no raw text",
+      "pos": [
+        550,
+        110
+      ],
+      "size": [
+        170,
+        68
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AgentCore runtime",
+      "wraps": [
+        "preOperator",
+        "redactedTracing",
+        "caseMemory",
+        "knowledgeBase",
+        "copilot"
+      ],
+      "pad": 26
+    }
+  ],
+  "connections": [
+    {
+      "id": "callerToPreOperator",
+      "from": "caller",
+      "to": "preOperator",
+      "label": "contact"
+    },
+    {
+      "id": "preOperatorToSystems",
+      "from": "preOperator",
+      "to": "caseSystems",
+      "label": "lookup",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "preOperatorToMemory",
+      "from": "preOperator",
+      "to": "caseMemory",
+      "label": "summary",
+      "variant": "emphasis"
+    },
+    {
+      "id": "memoryToCopilot",
+      "from": "caseMemory",
+      "to": "copilot",
+      "label": "context",
+      "variant": "emphasis"
+    },
+    {
+      "id": "copilotToKnowledge",
+      "from": "copilot",
+      "to": "knowledgeBase",
+      "label": "retrieve",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "copilotToGuardrail",
+      "from": "copilot",
+      "to": "outputGuardrail",
+      "label": "check",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    {
+      "id": "copilotToOperator",
+      "from": "copilot",
+      "to": "operatorDesk",
+      "label": "cards",
+      "variant": "emphasis"
+    },
+    {
+      "id": "operatorToBus",
+      "from": "operatorDesk",
+      "to": "eventBus",
+      "label": "chat + actions",
+      "labelAt": [
+        1160,
+        434
+      ]
+    },
+    {
+      "id": "busToCopilot",
+      "from": "eventBus",
+      "to": "copilot",
+      "label": "message",
+      "fromSide": "left",
+      "toSide": "bottom"
+    },
+    {
+      "id": "preOperatorToTracing",
+      "from": "preOperator",
+      "to": "redactedTracing",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    {
+      "id": "copilotToTracing",
+      "from": "copilot",
+      "to": "redactedTracing",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "right"
+    }
+  ]
+}

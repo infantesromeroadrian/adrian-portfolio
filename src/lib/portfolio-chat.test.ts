@@ -41,7 +41,7 @@ test("recommendations receive all public write-ups, exact links and evidence lim
   }
   assert.match(systemMessage, /credited to HTB/);
   assert.match(systemMessage, /partial reproduction because the original input is unavailable/);
-  for (const study of ["guardrails-as-code", "protected-agent-runtime", "evidence-led-operations"]) {
+  for (const study of ["guardrails-as-code", "protected-agent-runtime", "evidence-led-operations", "shared-guardrail-platform", "guarded-rag-copilot"]) {
     assert.ok(systemMessage.includes(`https://adrian-portfolio-three-wheat.vercel.app/architecture/${study}.html`));
   }
   assert.match(systemMessage, /Do not claim production deployment, measured performance, or security outcomes/);

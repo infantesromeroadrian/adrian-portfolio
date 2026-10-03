@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Shared guardrail platform",
+    "locale": "en",
+    "visual_preset": "editorial",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1280,
+      680
+    ]
+  },
+  "components": [
+    {
+      "id": "riskProfiles",
+      "type": "security",
+      "label": "Risk profiles",
+      "sublabel": "Baseline + medium risk",
+      "pos": [
+        40,
+        130
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "projectOverlays",
+      "type": "security",
+      "label": "Project overlays",
+      "sublabel": "PII + topic scope",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "rolloutStage",
+      "type": "security",
+      "label": "Rollout stage",
+      "sublabel": "Observe, pilot, enforce",
+      "pos": [
+        40,
+        470
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "centralModule",
+      "type": "backend",
+      "label": "Central guardrail module",
+      "sublabel": "Terraform, one pipeline",
+      "tag": "producer",
+      "pos": [
+        290,
+        128
+      ],
+      "size": [
+        200,
+        72
+      ]
+    },
+    {
+      "id": "accountGuardrail",
+      "type": "cloud",
+      "label": "Guardrail per account",
+      "sublabel": "Amazon Bedrock, versioned",
+      "pos": [
+        570,
+        128
+      ],
+      "size": [
+        180,
+        72
+      ]
+    },
+    {
+      "id": "versionContract",
+      "type": "cloud",
+      "label": "Version contract",
+      "sublabel": "SSM, read at deploy",
+      "tag": "ID + version + mode",
+      "pos": [
+        570,
+        390
+      ],
+      "size": [
+        180,
+        72
+      ]
+    },
+    {
+      "id": "fieldAgent",
+      "type": "backend",
+      "label": "Field-service agent",
+      "sublabel": "Consumer account A",
+      "pos": [
+        850,
+        130
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "messagingAgent",
+      "type": "backend",
+      "label": "Messaging agent",
+      "sublabel": "Consumer account B",
+      "pos": [
+        850,
+        300
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "copilotAgent",
+      "type": "backend",
+      "label": "Contact-center copilot",
+      "sublabel": "Consumer account C",
+      "pos": [
+        850,
+        470
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "maskedFindings",
+      "type": "cloud",
+      "label": "Masked findings",
+      "sublabel": "Shared trace families",
+      "pos": [
+        1090,
+        300
+      ],
+      "size": [
+        150,
+        68
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Each consumer AWS account",
+      "wraps": [
+        "accountGuardrail",
+        "versionContract",
+        "fieldAgent",
+        "messagingAgent",
+        "copilotAgent"
+      ],
+      "pad": 26
+    }
+  ],
+  "connections": [
+    {
+      "id": "profilesToModule",
+      "from": "riskProfiles",
+      "to": "centralModule",
+      "label": "baseline",
+      "variant": "security"
+    },
+    {
+      "id": "overlaysToModule",
+      "from": "projectOverlays",
+      "to": "centralModule",
+      "label": "scoped delta",
+      "variant": "security"
+    },
+    {
+      "id": "moduleToGuardrail",
+      "from": "centralModule",
+      "to": "accountGuardrail",
+      "label": "deploy",
+      "variant": "emphasis"
+    },
+    {
+      "id": "guardrailToContract",
+      "from": "accountGuardrail",
+      "to": "versionContract",
+      "label": "publish version",
+      "variant": "emphasis",
+      "labelAt": [
+        660,
+        296
+      ]
+    },
+    {
+      "id": "stageToContract",
+      "from": "rolloutStage",
+      "to": "versionContract",
+      "label": "enforcement mode",
+      "variant": "security"
+    },
+    {
+      "id": "contractToField",
+      "from": "versionContract",
+      "to": "fieldAgent"
+    },
+    {
+      "id": "contractToMessaging",
+      "from": "versionContract",
+      "to": "messagingAgent"
+    },
+    {
+      "id": "contractToCopilot",
+      "from": "versionContract",
+      "to": "copilotAgent"
+    },
+    {
+      "id": "fieldToFindings",
+      "from": "fieldAgent",
+      "to": "maskedFindings"
+    },
+    {
+      "id": "messagingToFindings",
+      "from": "messagingAgent",
+      "to": "maskedFindings"
+    },
+    {
+      "id": "copilotToFindings",
+      "from": "copilotAgent",
+      "to": "maskedFindings"
+    }
+  ]
+}
