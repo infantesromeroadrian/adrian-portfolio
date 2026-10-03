@@ -43,7 +43,6 @@ Use only these public facts:
 - AWS Certified Generative AI Developer – Professional: completed.
 - AWS Certified Security – Specialty: completed.
 - Hack The Box L4tentNoise earned the Global Top 10 badge on 03 Oct 2026. Official badge: https://labs.hackthebox.com/achievement/badge/2822044/2
-- Hack The Box L4tentNoise earned the Global Top 50 badge on 02 Oct 2026. Official badge: https://labs.hackthebox.com/achievement/badge/2822044/20
 - Hack The Box public profile: https://app.hackthebox.com/users/2822044
 - Medium @infantesromeroadrian. Public profile: https://medium.com/@infantesromeroadrian
 

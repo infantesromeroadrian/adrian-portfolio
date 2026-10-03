@@ -31,9 +31,8 @@ estrecho. COAE publica su identificador y un enlace seguro a la página de
 verificación de Hack The Box; las certificaciones no publican fechas.
 
 Awards continúa con el alias L4tentNoise, el titular Hack The Box Global Top 10,
-copias locales de los badges Top 10 y Top 50 enlazadas a sus reconocimientos
-oficiales y un enlace secundario al perfil. Todos los destinos abren en una pestaña
-nueva y conservan el foco visible.
+una copia local del badge enlazada al reconocimiento oficial y un enlace secundario
+al perfil. Ambos destinos abren en una pestaña nueva y conservan el foco visible.
 
 Después de la intro, AI Security Write-ups presenta cuatro análisis y
 reproducciones de laboratorios HTB, con enlaces directos a Medium y una conclusión
@@ -95,7 +94,7 @@ node --test src/lib/portfolio-chat.test.ts
 ```
 
 La página principal no depende de fuentes, imágenes ni scripts remotos en
-runtime. Las dos portadas y los badges de Hack The Box viven en `public/images/`;
+runtime. Las dos portadas y el badge de Hack The Box viven en `public/images/`;
 las portadas comparten dimensiones para conservar su alineación durante el
 revelado. El chat sí depende de Ollama Cloud a través del endpoint server-only;
 la clave nunca se envía al navegador.
