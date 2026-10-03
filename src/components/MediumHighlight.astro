@@ -1,8 +1,34 @@
+---
+import { securityWriteUps } from "../lib/public-work";
+---
+
 <section class="medium-highlight" aria-labelledby="medium-title">
   <header class="medium-heading">
-    <h2 id="medium-title">Write-ups &amp; Papers</h2>
-    <p class="medium-handle">@infantesromeroadrian</p>
+    <h2 id="medium-title">AI Security Write-ups</h2>
+    <p class="medium-introduction">
+      Four analyses of Hack The Box labs, focused on defensive lessons and the limits of the evidence.
+    </p>
   </header>
+
+  <ol class="write-up-cards" role="list">
+    {securityWriteUps.map((writeUp, index) => (
+      <li>
+        <article class="write-up-card">
+          <p class="write-up-card__scope">
+            <span aria-hidden="true">{String(index + 1).padStart(2, "0")} / </span>
+            {writeUp.scope}
+          </p>
+          <h3>
+            <a href={writeUp.href} target="_blank" rel="noopener noreferrer">
+              {writeUp.title}<span class="visually-hidden"> (opens in a new tab)</span>
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          </h3>
+          <p class="write-up-card__takeaway">{writeUp.takeaway}</p>
+        </article>
+      </li>
+    ))}
+  </ol>
 
   <nav class="public-profiles" aria-label="Writing and public profiles">
     <a

@@ -15,7 +15,7 @@ y no publica fechas.
 
 AWS Architect continúa como un folio editorial de tres láminas técnicas:
 guardrails como código, un runtime de agente protegido y operaciones guiadas por
-evidencia. Cada caso combina una descripción breve, su alcance técnico y una
+evidencia. Cada caso expone su problema, decisión principal, limitación y alcance técnico, con una
 miniatura WebP enlazada al mapa Archify interactivo completo en `/architecture/`.
 La galería muestra tres columnas en pantallas amplias, dos en tablet y una en
 móvil, evitando que los mapas ocupen la página a tamaño completo.
@@ -34,11 +34,20 @@ Awards continúa con el alias L4tentNoise, el titular Hack The Box Global Top 50
 una copia local del badge enlazada al reconocimiento oficial y un enlace secundario
 al perfil. Ambos destinos abren en una pestaña nueva y conservan el foco visible.
 
-Debajo de la portada de la intro aparece una pieza editorial compacta de Medium
-con su marca monocroma inline y acceso directo a `@infantesromeroadrian`. El enlace
-abre el perfil en una pestaña nueva. Debajo, una fila de enlaces con icono y texto
-conecta los perfiles públicos de LinkedIn, GitHub y X. Todo el contenido sigue
-siendo legible sin JavaScript.
+Después de la intro, AI Security Write-ups presenta cuatro análisis y
+reproducciones de laboratorios HTB, con enlaces directos a Medium y una conclusión
+defensiva por artículo. Sigma Technology conserva el alcance de reproducción
+parcial. La sección mantiene los perfiles públicos de Medium, LinkedIn, GitHub y X.
+Los artículos y casos AWS comparten catálogo en `src/lib/public-work.ts` con los
+hechos públicos del chat. Todo el contenido sigue siendo legible sin JavaScript.
+
+El menú y el chat limitan su altura al espacio visible y permiten desplazamiento
+vertical. En vistas de poca altura, el chat utiliza casi toda la pantalla para
+mantener accesibles el formulario y sus controles. Las etiquetas de redes
+mantienen nombres accesibles cuando se muestran solo sus iconos.
+
+Los metadatos canonical, Open Graph y Twitter usan el dominio público y la
+portada PNG local existente; las URL de compartir son absolutas.
 
 ## Desarrollo local
 
@@ -71,6 +80,7 @@ compartida en el borde si aparece abuso sostenido entre varias instancias.
 
 ```sh
 npm run build
+node --test src/lib/portfolio-chat.test.ts
 ```
 
 La página principal no depende de fuentes, imágenes ni scripts remotos en

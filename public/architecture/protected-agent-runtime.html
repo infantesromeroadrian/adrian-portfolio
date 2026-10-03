@@ -4971,6 +4971,23 @@
       .source-evidence-beacon,
       svg [data-node-id], svg [data-edge-from], svg [data-detail], svg [data-detail-anchor], svg [data-legend-hit], svg { transition: none !important; }
     }
+
+    .keyboard-shortcut-setting {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      width: fit-content;
+      min-height: 2.75rem;
+      margin: 0 0 1rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .keyboard-shortcut-setting input { width: 1.1rem; height: 1.1rem; }
+    .keyboard-shortcut-setting input:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 3px;
+    }
   </style>
 </head>
 <body>
@@ -5083,6 +5100,11 @@
         <h1>Protected agent runtime</h1>
       </div>
     </div>
+
+    <label class="keyboard-shortcut-setting no-print">
+      <input id="enable-single-key-shortcuts" type="checkbox">
+      Enable single-key shortcuts
+    </label>
 
     <script id="archify-guided-views-data" type="application/json">[]</script>
 
@@ -5381,6 +5403,7 @@
             <kbd aria-hidden="true">F</kbd>
           </button>
         </div>
+        <p>Enable single-key shortcuts above the diagram to use these keys. Escape is always available.</p>
         <div class="diagram-guide-shortcuts" aria-label="Additional keyboard shortcuts">
           <span><kbd>E</kbd> Export</span><span><kbd>T</kbd> Theme</span><span><kbd>S</kbd> Style</span><span><kbd>0</kbd> Reset</span><span><kbd>+</kbd> Zoom in</span><span><kbd>-</kbd> Zoom out</span><span><kbd>Esc</kbd> Close</span>
         </div>
@@ -10859,6 +10882,8 @@
       }, true);
 
       document.addEventListener('keydown', function (event) {
+        var shortcuts = document.getElementById('enable-single-key-shortcuts');
+        if (event.key.length === 1 && (!shortcuts || !shortcuts.checked)) return;
         if (event.metaKey || event.ctrlKey || event.altKey) return;
         if (document.documentElement.getAttribute('data-guide-open') === 'true') return;
         var target = event.target;
@@ -14979,6 +15004,8 @@
        Ignored when focus is inside an input/textarea/contenteditable.
        ============================================================ */
     document.addEventListener('keydown', function (e) {
+      var shortcuts = document.getElementById('enable-single-key-shortcuts');
+      if (e.key.length === 1 && (!shortcuts || !shortcuts.checked)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.defaultPrevented) return;
       var t = e.target;
