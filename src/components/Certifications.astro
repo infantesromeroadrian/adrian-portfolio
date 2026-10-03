@@ -8,12 +8,6 @@ type Certification = {
 
 const certifications: readonly Certification[] = [
   {
-    title: "HTB Certified Offensive AI Expert (COAE)",
-    issuer: "Hack The Box",
-    credentialId: "HTBCERT-1287C8C6C3",
-    verificationUrl: "https://www.hackthebox.com/certificates",
-  },
-  {
     title: "AWS Certified Generative AI Developer – Professional",
     issuer: "Amazon Web Services",
   },
@@ -24,7 +18,7 @@ const certifications: readonly Certification[] = [
 ];
 ---
 
-<section class="certifications" aria-labelledby="certifications-title">
+<section class="certifications" id="certifications" aria-labelledby="certifications-title">
   <h2 id="certifications-title">Certifications</h2>
   <ul class="certification-grid" role="list">
     {certifications.map((certification) => (

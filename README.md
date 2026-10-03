@@ -5,51 +5,54 @@ y dos portadas superpuestas. Una máscara circular controlada por puntero revela
 la identidad de AI Red Teamer bajo la portada de AI Security Architect.
 
 La portada abre el propio portfolio en `/`, dentro de un bloque de ancho máximo
-centrado. En móvil, el nombre y la miniportada comparten fila; About continúa
-debajo. Experience y Education continúan inmediatamente después, cada una con su
-propia línea de tiempo. Ambas comparten un bloque editorial de dos columnas iguales,
-con encabezados alineados y un divisor central, también a 768 px. Por debajo de
-47,5 rem se apilan y el divisor pasa a ser horizontal.
-Experience muestra periodos profesionales. Education conserva el orden solicitado
-y no publica fechas.
+centrado. Bajo el rol muestra una franja de pruebas con enlaces internos (Hack The
+Box Global Top 10, COAE, certificaciones AWS y las cinco arquitecturas). En móvil,
+el nombre y la miniportada comparten fila; la franja y About continúan debajo, y
+la maquetación reserva espacio superior para que el botón fijo del menú no tape el
+kicker. Las portadas se sirven en WebP (480, 800 y 1122 px) con `srcset`; la
+profesional lleva `fetchpriority="high"` y la ofensiva carga con prioridad baja.
 
-AWS Architect continúa como un folio editorial de cinco láminas técnicas:
-guardrails como código, un runtime de agente protegido, operaciones guiadas por
-evidencia, una plataforma de guardrails compartida entre cuentas y un copiloto RAG
-protegido. Son estudios genéricos: no publican nombres de clientes, cuentas,
-repositorios ni recursos. Cada caso expone su problema, decisión principal, limitación y alcance técnico, con una
-miniatura WebP enlazada al mapa Archify interactivo completo en `/architecture/`.
-La galería muestra tres columnas en pantallas amplias, dos en tablet y una en
-móvil, evitando que los mapas ocupen la página a tamaño completo.
+El orden de la página es: Intro, AWS Architect, Certifications, AI Red Teaming,
+AI Security Write-ups, Experience/Education y Contact, seguido del pie. Experience
+y Education comparten un bloque editorial de dos columnas iguales, con encabezados
+alineados y un divisor central, también a 768 px; por debajo de 47,5 rem se apilan
+y el divisor pasa a ser horizontal. Experience muestra periodos profesionales.
+Education conserva el orden solicitado y no publica fechas. Cada mecanismo combina
+una rueda principal y una satélite que giran en sentidos opuestos al alcanzar el
+hito; los dos ejes avanzan con scroll nativo. Todo el contenido permanece visible
+sin JavaScript; con reduced-motion los ejes se muestran completos y los engranajes
+no giran.
 
-Cada mecanismo combina una rueda principal y una satélite que giran en sentidos
-opuestos al alcanzar el hito. Los dos ejes avanzan de manera independiente con
-scroll nativo. Todo el contenido permanece visible sin JavaScript; con
-reduced-motion los ejes se muestran completos y los engranajes no giran.
+AWS Architect es un folio editorial de cinco láminas técnicas. Cada lámina expone problema,
+decisión, limitación y alcance técnico, con una miniatura WebP enlazada al mapa
+Archify interactivo en `/architecture/`. La galería muestra tres columnas en
+pantallas amplias, dos en tablet y una en móvil. No se publican nombres de
+clientes, cuentas, repositorios ni recursos.
 
-Certifications aparece a continuación con tres credenciales completadas en una
-retícula editorial: tres columnas en escritorio y tablet, y una en móvil
-estrecho. COAE publica su identificador y un enlace seguro a la página de
-verificación de Hack The Box; las certificaciones no publican fechas.
+Certifications reúne solo las dos credenciales de AWS en una retícula de dos
+columnas (una en móvil estrecho). AI Red Teaming agrupa el alias L4tentNoise, el
+titular Hack The Box Global Top 10, el badge enlazado al reconocimiento oficial, el
+enlace al perfil y la credencial COAE con su identificador y enlace de
+verificación. Todos los destinos externos abren en una pestaña nueva con foco
+visible.
 
-Awards continúa con el alias L4tentNoise, el titular Hack The Box Global Top 10,
-una copia local del badge enlazada al reconocimiento oficial y un enlace secundario
-al perfil. Ambos destinos abren en una pestaña nueva y conservan el foco visible.
-
-Después de la intro, AI Security Write-ups presenta cuatro análisis y
-reproducciones de laboratorios HTB, con enlaces directos a Medium y una conclusión
-defensiva por artículo. Sigma Technology conserva el alcance de reproducción
-parcial. La sección mantiene los perfiles públicos de Medium, LinkedIn, GitHub y X.
-Los artículos y casos AWS comparten catálogo en `src/lib/public-work.ts` con los
-hechos públicos del chat. Todo el contenido sigue siendo legible sin JavaScript.
+AI Security Write-ups presenta cuatro análisis de retos HTB con enlaces directos a
+Medium y una conclusión defensiva por artículo; Sigma Technology conserva el
+alcance de reproducción parcial. Contact cierra la página con un enlace principal a
+LinkedIn, los perfiles públicos (Medium, LinkedIn, GitHub, X y Hack The Box) y una
+nota sobre la seguridad del asistente; no publica correo electrónico. Los artículos
+y casos AWS comparten catálogo en `src/lib/public-work.ts` con los hechos públicos
+del chat. Todo el contenido sigue siendo legible sin JavaScript.
 
 El menú y el chat limitan su altura al espacio visible y permiten desplazamiento
 vertical. En vistas de poca altura, el chat utiliza casi toda la pantalla para
-mantener accesibles el formulario y sus controles. Las etiquetas de redes
-mantienen nombres accesibles cuando se muestran solo sus iconos.
+mantener accesibles el formulario y sus controles. En móvil el orbe del asistente
+reduce su tamaño y el pie añade margen inferior para que no tape el final. El
+panel incluye un desplegable «How this assistant is secured».
 
-Los metadatos canonical, Open Graph y Twitter usan el dominio público y la
-portada PNG local existente; las URL de compartir son absolutas.
+Los metadatos canonical, Open Graph y Twitter usan el dominio público y una tarjeta
+social de 1200×630 (`public/images/og-card.png`); las URL de compartir son
+absolutas. Hay favicon SVG e ICO y `apple-touch-icon`.
 
 ## Desarrollo local
 
@@ -96,7 +99,7 @@ node --test src/lib/portfolio-chat.test.ts
 ```
 
 La página principal no depende de fuentes, imágenes ni scripts remotos en
-runtime. Las dos portadas y el badge de Hack The Box viven en `public/images/`;
+runtime. Las portadas (WebP), la tarjeta social y el badge de Hack The Box viven en `public/images/`;
 las portadas comparten dimensiones para conservar su alineación durante el
 revelado. El chat sí depende de Ollama Cloud a través del endpoint server-only;
 la clave nunca se envía al navegador.

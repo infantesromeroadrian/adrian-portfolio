@@ -11,25 +11,25 @@ export const securityWriteUps = [
   {
     title: "Doctrine Studio: A Prompt Is Not a Permission Boundary",
     takeaway: "Permission checks belong in the application. A model's instructions cannot replace them.",
-    scope: "HTB lab analysis and reproduction",
+    scope: "HTB challenge analysis and reproduction",
     href: "https://medium.com/@infantesromeroadrian/doctrine-studio-a-prompt-is-not-a-permission-boundary-6d51785b9e4e",
   },
   {
     title: "Power Supply: Sensitive Data Stays Sensitive Across Turns",
     takeaway: "Data keeps its sensitivity throughout a conversation. Access checks must hold across turns.",
-    scope: "HTB lab analysis and reproduction",
+    scope: "HTB challenge analysis and reproduction",
     href: "https://medium.com/@infantesromeroadrian/power-supply-sensitive-data-stays-sensitive-across-turns-c2c86ad4eead",
   },
   {
     title: "Neural Detonator: Models Can Carry Code",
     takeaway: "Treat ML artifacts as software: verify their provenance, inspect them, and isolate their execution.",
-    scope: "HTB lab analysis and reproduction",
+    scope: "HTB challenge analysis and reproduction",
     href: "https://medium.com/@infantesromeroadrian/neural-detonator-un-modelo-tambi%C3%A9n-puede-esconder-c%C3%B3digo-9150c5660ba8",
   },
   {
     title: "Sigma Technology: A Partial Reproduction and Missing Evidence",
     takeaway: "Separate validated observations from missing evidence. The original input is unavailable, so the reproduction remains partial.",
-    scope: "Partial HTB lab reproduction",
+    scope: "Partial HTB challenge reproduction",
     href: "https://medium.com/@infantesromeroadrian/sigma-technology-a-partial-reproduction-and-missing-evidence-87bfe57eed8b",
   },
 ] satisfies readonly SecurityWriteUp[];

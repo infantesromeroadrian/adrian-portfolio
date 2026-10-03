@@ -43,10 +43,11 @@ a {
   grid-template-areas:
     "kicker"
     "heading"
+    "proof"
     "about"
     "."
     "footer";
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: auto auto auto auto 1fr auto;
   background: #ebe8e1;
 }
 
@@ -90,6 +91,33 @@ a {
   font-size: clamp(1.15rem, 2vw, 1.75rem);
   font-weight: 700;
   line-height: 1;
+}
+
+.proof-strip {
+  grid-area: proof;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.proof-strip a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  color: #3d4b53;
+  font-family: "Aptos Narrow", "Arial Narrow", sans-serif;
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+}
+
+.proof-strip li + li {
+  position: relative;
 }
 
 .editorial-about {
@@ -248,7 +276,7 @@ a {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding-block: 2rem;
+  padding-block: 2rem calc(6rem + env(safe-area-inset-bottom));
   border-top: 1px solid #b5b4ad;
   color: #525b60;
   font-size: 0.85rem;
@@ -463,14 +491,16 @@ a:focus-visible {
     grid-template-areas:
       "kicker kicker"
       "heading visual"
+      "proof proof"
       "about about"
       "footer footer";
     grid-template-columns: minmax(0, 3fr) minmax(7.5rem, 2fr);
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
+    padding-top: 4.5rem;
     column-gap: clamp(0.75rem, 3vw, 1rem);
     row-gap: clamp(1.25rem, 4vw, 1.75rem);
     min-height: 0;
-    padding-block: clamp(1rem, 4vw, 2rem) 2.5rem;
+    padding-block: 4.5rem 2.5rem;
   }
 
   .editorial-panel {
@@ -508,6 +538,10 @@ a:focus-visible {
   .editorial-about p {
     font-size: 1rem;
     line-height: 1.4;
+  }
+
+  .proof-strip {
+    margin-top: 0;
   }
 
   .editorial-footer {
@@ -751,7 +785,7 @@ a:focus-visible {
 
 .certification-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2rem;
   margin: 0;
   padding: 0;
@@ -872,6 +906,11 @@ a:focus-visible {
   text-underline-offset: 0.3em;
 }
 
+.htb-credential {
+  grid-column: 1 / -1;
+  max-width: 34rem;
+}
+
 .htb-badge-link {
   display: block;
   min-width: 0;
@@ -989,79 +1028,95 @@ a:focus-visible {
   }
 }
 
-.public-profiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.75rem;
-  justify-content: flex-start;
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem clamp(2rem, 5vw, 5rem);
+  width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+  margin-inline: auto;
+  padding-block: clamp(3rem, 6vw, 5.5rem);
+  border-top: 1px solid #b5b4ad;
 }
 
-.public-profile-link {
+.contact-heading {
+  min-width: 0;
+}
+
+.contact h2 {
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(2.8rem, 5.4vw, 5.25rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.contact-introduction {
+  max-width: 28ch;
+  margin: 1.25rem 0 0;
+  color: #333a3e;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+  line-height: 1.45;
+}
+
+.contact-body {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+  align-content: start;
+}
+
+.contact-cta {
   display: inline-flex;
-  gap: 0.35rem;
   align-items: center;
-  min-height: 2.75rem;
-  color: #525b60;
-  font-size: 0.75rem;
-  line-height: 1.2;
+  justify-self: start;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.7rem 1.25rem;
+  background: #111417;
+  color: #f5f2eb;
+  font-size: 1rem;
+  font-weight: 700;
   text-decoration: none;
 }
 
-.public-profile-link svg {
-  flex: 0 0 auto;
-  width: 1rem;
-  height: 1rem;
-  fill: currentColor;
+.contact-cta:hover {
+  background: #3e6577;
 }
 
-.public-profile-link .medium-brand {
-  width: 1.7rem;
-  height: 1rem;
+.contact-profiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.public-profile-link:hover span {
-  text-decoration: underline;
+.contact-profiles a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: #3e6577;
+  font-size: 0.95rem;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.3em;
 }
 
-@media (max-width: 60rem) {
-  .public-profiles {
-    display: grid;
-    grid-template-columns: repeat(4, 2.75rem);
-    gap: 0.25rem;
-    width: max-content;
-  }
-
-  .public-profile-link {
-    justify-content: center;
-    width: 2.75rem;
-    min-width: 2.75rem;
-    height: 2.75rem;
-    min-height: 2.75rem;
-  }
-
-  .public-profile-link svg {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-
-  .public-profile-link span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+.contact-note {
+  max-width: 44ch;
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid #b5b4ad;
+  color: #525b60;
+  font-size: 0.85rem;
+  line-height: 1.55;
 }
 
-@media (max-width: 34.9375rem) {
-  .public-profiles {
-    grid-template-columns: repeat(2, 2.75rem);
-    gap: 0.35rem;
+@media (max-width: 47.5rem) {
+  .contact {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -1091,12 +1146,13 @@ a:focus-visible {
 :is(
   #intro-title,
   #about-title,
+  #aws-architect,
+  #certifications,
+  #ai-red-teaming,
   #medium-title,
   #experience,
   #education,
-  #aws-architect,
-  #certifications-title,
-  #htb-title
+  #contact
 ) {
   scroll-margin-top: 6rem;
 }
@@ -1390,6 +1446,32 @@ a:focus-visible {
   font-size: 0.75rem;
 }
 
+.portfolio-chat__security {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #b5b4ad;
+  color: #333a3e;
+  font-size: 0.75rem;
+}
+
+.portfolio-chat__security summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  color: #3e6577;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.portfolio-chat__security ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.portfolio-chat__security summary:focus-visible {
+  outline: 2px solid #3e6577;
+  outline-offset: 2px;
+}
+
 .portfolio-chat__status {
   margin: 0.85rem 0 0;
   color: #525b60;
@@ -1530,6 +1612,21 @@ a:focus-visible {
 }
 
 @media (max-width: 35rem) {
+  .portfolio-chat {
+    --chat-bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 1.25rem));
+  }
+
+  .portfolio-chat__toggle,
+  .portfolio-chat__toggle canvas,
+  .portfolio-chat__fallback {
+    width: 48px;
+    height: 48px;
+  }
+
+  .portfolio-chat__panel {
+    bottom: calc(var(--chat-bottom) + 4.25rem);
+  }
+
   .site-navigation__toggle-label {
     position: absolute;
     width: 1px;

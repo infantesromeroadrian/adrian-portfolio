@@ -1,0 +1,53 @@
+---
+type Profile = { label: string; href: string; name: string };
+
+const profiles: readonly Profile[] = [
+  { label: "Medium", href: "https://medium.com/@infantesromeroadrian", name: "@infantesromeroadrian on Medium" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/adrianinfantes/", name: "Adrian Infantes on LinkedIn" },
+  { label: "GitHub", href: "https://github.com/infantesromeroadrian", name: "infantesromeroadrian on GitHub" },
+  { label: "X", href: "https://x.com/infantes_adrian", name: "infantes_adrian on X" },
+  { label: "Hack The Box", href: "https://app.hackthebox.com/users/2822044", name: "L4tentNoise on Hack The Box" },
+];
+---
+
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <header class="contact-heading">
+    <h2 id="contact-title">Contact</h2>
+    <p class="contact-introduction">
+      Available for AI security architecture and AI red-team engagements.
+    </p>
+  </header>
+
+  <div class="contact-body">
+    <a
+      class="contact-cta"
+      href="https://www.linkedin.com/in/adrianinfantes/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Message Adrian Infantes on LinkedIn (opens in a new tab)"
+    >
+      Message me on LinkedIn <span aria-hidden="true">↗</span>
+    </a>
+
+    <ul class="contact-profiles" role="list" aria-label="Public profiles">
+      {profiles.map((profile) => (
+        <li>
+          <a
+            href={profile.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View ${profile.name} (opens in a new tab)`}
+          >
+            {profile.label} <span aria-hidden="true">↗</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="contact-note">
+      The AI assistant on this page is a small security exercise of its own: it answers
+      only from public facts, treats visitor messages as untrusted data, is rate-limited,
+      and replies in plain text.
+    </p>
+  </div>
+</section>

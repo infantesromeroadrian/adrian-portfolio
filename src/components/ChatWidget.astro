@@ -1,4 +1,4 @@
-<aside class="portfolio-chat" data-portfolio-chat>
+<aside class="portfolio-chat" aria-label="AI portfolio assistant" data-portfolio-chat>
   <section
     class="portfolio-chat__panel"
     id="portfolio-chat-panel"
@@ -27,6 +27,15 @@
         AI assistant. Answers come from public portfolio information and may be wrong.
         This conversation is not persisted.
       </p>
+      <details class="portfolio-chat__security">
+        <summary>How this assistant is secured</summary>
+        <ul>
+          <li>Answers only from public portfolio facts.</li>
+          <li>Treats your messages as untrusted data.</li>
+          <li>Rate-limited per visitor.</li>
+          <li>Replies appear as plain text, never HTML, and nothing is stored.</li>
+        </ul>
+      </details>
       <p class="portfolio-chat__status" role="status" aria-live="polite" data-chat-status>
         Checking availability…
       </p>
