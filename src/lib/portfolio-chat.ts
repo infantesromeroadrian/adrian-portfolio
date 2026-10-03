@@ -21,6 +21,13 @@ const MAX_RESPONSE_CHARACTERS = 4_000;
 const PROVIDER_TIMEOUT_MS = 12_000;
 const PROVIDER_MAX_TOKENS = 600;
 
+const MINUTE_MS = 60_000;
+const DAY_MS = 24 * 60 * MINUTE_MS;
+const MAX_CLIENT_MESSAGES_PER_MINUTE = 5;
+const MAX_CLIENT_MESSAGES_PER_DAY = 30;
+const MAX_INSTANCE_MESSAGES_PER_DAY = 300;
+const UNKNOWN_CLIENT = "unknown";
+
 const PUBLIC_FACTS = `
 You are the AI assistant for Adrian Infantes's public portfolio.
 
@@ -65,31 +72,153 @@ type ChatMessage = Readonly<{
 
 type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
 
-type ChatDependencies = Readonly<{
-  environment?: RuntimeEnvironment;
-  fetchImplementation?: typeof fetch;
-}>;
-
 type PublicErrorCode =
   | "INVALID_ORIGIN"
   | "INVALID_REQUEST"
   | "PAYLOAD_TOO_LARGE"
   | "PROVIDER_ERROR"
   | "PROVIDER_TIMEOUT"
+  | "RATE_LIMITED"
   | "SERVICE_UNAVAILABLE"
   | "UNSUPPORTED_MEDIA_TYPE";
 
 class PublicChatError extends Error {
   readonly status: number;
   readonly code: PublicErrorCode;
+  readonly retryAfterSeconds?: number;
 
-  constructor(status: number, code: PublicErrorCode, message: string) {
+  constructor(status: number, code: PublicErrorCode, message: string, retryAfterSeconds?: number) {
     super(message);
     this.name = "PublicChatError";
     this.status = status;
     this.code = code;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 }
+
+type RateLimitScope = "client-minute" | "client-day" | "instance-day";
+
+type RateLimitDecision =
+  | Readonly<{ allowed: true }>
+  | Readonly<{ allowed: false; scope: RateLimitScope; retryAfterSeconds: number }>;
+
+type CounterWindow = Readonly<{
+  startedAt: number;
+  count: number;
+}>;
+
+type ClientUsage = Readonly<{
+  minute: CounterWindow;
+  day: CounterWindow;
+}>;
+
+function activeWindow(window: CounterWindow, now: number, durationMs: number): CounterWindow {
+  return now - window.startedAt >= durationMs ? { startedAt: now, count: 0 } : window;
+}
+
+function secondsUntilReset(window: CounterWindow, now: number, durationMs: number): number {
+  return Math.max(1, Math.ceil((window.startedAt + durationMs - now) / 1_000));
+}
+
+function incremented(window: CounterWindow): CounterWindow {
+  return { startedAt: window.startedAt, count: window.count + 1 };
+}
+
+const IPV4_MAPPED_IPV6 = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/;
+
+function ipv6NetworkPrefix(address: string): string {
+  const [head = "", tail] = address.split("::", 2);
+  const headGroups = head ? head.split(":") : [];
+  const tailGroups = tail ? tail.split(":") : [];
+  // An embedded dotted IPv4 tail occupies two 16-bit groups.
+  const tailWidth = tailGroups.reduce((width, group) => width + (group.includes(".") ? 2 : 1), 0);
+  const omittedGroups = tail === undefined ? 0 : Math.max(0, 8 - headGroups.length - tailWidth);
+  const groups = [...headGroups, ...Array<string>(omittedGroups).fill("0"), ...tailGroups];
+  return groups.slice(0, 4).map((group) => Number.parseInt(group, 16).toString(16)).join(":");
+}
+
+/**
+ * One end site usually receives a whole IPv6 /64, so counting each /128 separately would
+ * let a single host rotate addresses and drain the instance budget.
+ */
+function rateLimitKey(clientAddress: string | undefined): string {
+  const address = clientAddress?.trim().toLowerCase();
+  if (!address) {
+    return UNKNOWN_CLIENT;
+  }
+
+  const mappedIpv4 = IPV4_MAPPED_IPV6.exec(address)?.[1];
+  if (mappedIpv4) {
+    return mappedIpv4;
+  }
+  return address.includes(":") ? `${ipv6NetworkPrefix(address)}::/64` : address;
+}
+
+/**
+ * Fixed-window limits per client (IPv4 address or IPv6 /64) plus a daily budget for this
+ * server instance.
+ *
+ * State lives in instance memory: Vercel reuses warm instances, so a scripted loop is
+ * throttled, but each concurrent instance keeps its own counters. A shared store or a
+ * Vercel WAF rule is required for a hard limit across instances.
+ */
+export class ChatRateLimiter {
+  readonly #clients = new Map<string, ClientUsage>();
+  readonly #now: () => number;
+  #instanceDay: CounterWindow;
+
+  constructor(now: () => number = Date.now) {
+    this.#now = now;
+    this.#instanceDay = { startedAt: now(), count: 0 };
+  }
+
+  consume(clientAddress: string | undefined): RateLimitDecision {
+    const clientKey = rateLimitKey(clientAddress);
+    const now = this.#now();
+    const instanceDay = activeWindow(this.#instanceDay, now, DAY_MS);
+    if (instanceDay !== this.#instanceDay) {
+      this.#instanceDay = instanceDay;
+      this.#forgetExpiredClients(now);
+    }
+
+    const usage = this.#clients.get(clientKey);
+    const minute = usage ? activeWindow(usage.minute, now, MINUTE_MS) : { startedAt: now, count: 0 };
+    const day = usage ? activeWindow(usage.day, now, DAY_MS) : { startedAt: now, count: 0 };
+
+    // Rejected requests consume no budget, and only accepted clients are stored, so the
+    // instance budget also bounds how many client entries this map can hold.
+    if (minute.count >= MAX_CLIENT_MESSAGES_PER_MINUTE) {
+      return { allowed: false, scope: "client-minute", retryAfterSeconds: secondsUntilReset(minute, now, MINUTE_MS) };
+    }
+    if (day.count >= MAX_CLIENT_MESSAGES_PER_DAY) {
+      return { allowed: false, scope: "client-day", retryAfterSeconds: secondsUntilReset(day, now, DAY_MS) };
+    }
+    if (instanceDay.count >= MAX_INSTANCE_MESSAGES_PER_DAY) {
+      return { allowed: false, scope: "instance-day", retryAfterSeconds: secondsUntilReset(instanceDay, now, DAY_MS) };
+    }
+
+    this.#clients.set(clientKey, { minute: incremented(minute), day: incremented(day) });
+    this.#instanceDay = incremented(instanceDay);
+    return { allowed: true };
+  }
+
+  #forgetExpiredClients(now: number): void {
+    for (const [clientKey, usage] of this.#clients) {
+      if (now - usage.day.startedAt >= DAY_MS) {
+        this.#clients.delete(clientKey);
+      }
+    }
+  }
+}
+
+const instanceRateLimiter = new ChatRateLimiter();
+
+type ChatDependencies = Readonly<{
+  environment?: RuntimeEnvironment;
+  fetchImplementation?: typeof fetch;
+  clientAddress?: string;
+  rateLimiter?: ChatRateLimiter;
+}>;
 
 const RESPONSE_HEADERS = {
   "Cache-Control": "no-store",
@@ -97,10 +226,10 @@ const RESPONSE_HEADERS = {
   "X-Content-Type-Options": "nosniff",
 } as const;
 
-function jsonResponse(body: unknown, status = 200): Response {
+function jsonResponse(body: unknown, status = 200, extraHeaders: Readonly<Record<string, string>> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: RESPONSE_HEADERS,
+    headers: { ...RESPONSE_HEADERS, ...extraHeaders },
   });
 }
 
@@ -113,7 +242,20 @@ function publicErrorResponse(error: PublicChatError): Response {
       },
     },
     error.status,
+    error.retryAfterSeconds === undefined ? {} : { "Retry-After": String(error.retryAfterSeconds) },
   );
+}
+
+function assertWithinRateLimit(rateLimiter: ChatRateLimiter, clientAddress: string | undefined): void {
+  const decision = rateLimiter.consume(clientAddress);
+  if (decision.allowed) {
+    return;
+  }
+
+  const message = decision.scope === "client-minute"
+    ? "Too many messages. Please wait a moment and try again."
+    : "The assistant has reached its message limit. Please try again later.";
+  throw new PublicChatError(429, "RATE_LIMITED", message, decision.retryAfterSeconds);
 }
 
 function runtimeEnvironment(override?: RuntimeEnvironment): RuntimeEnvironment {
@@ -398,6 +540,9 @@ export async function handleChatRequest(
     if (!apiKey) {
       throw new PublicChatError(503, "SERVICE_UNAVAILABLE", "The chat service is unavailable.");
     }
+
+    // Throttle before reading the body so rejected clients cost neither parsing nor provider quota.
+    assertWithinRateLimit(dependencies.rateLimiter ?? instanceRateLimiter, dependencies.clientAddress);
 
     const messages = await parseRequestMessages(request);
     const exactResponse = exactCertificationResponse(messages);

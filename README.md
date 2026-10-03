@@ -72,9 +72,19 @@ metadatos `Sec-Fetch-Site`, aplica un timeout de 12 segundos, limita la respuest
 del proveedor a 64 KiB y entrega como máximo 4.000 caracteres. Las respuestas no
 se almacenan en caché y los errores públicos no incluyen datos del proveedor.
 
-El endpoint no incorpora rate limiting distribuido. Los límites anteriores
-acotan cada petición, pero un despliegue público necesitará una protección
-compartida en el borde si aparece abuso sostenido entre varias instancias.
+Cada cliente (una IPv4 o una red IPv6 /64) puede enviar 5 mensajes por minuto y 30
+al día, y cada instancia del servidor acepta como máximo 300 al día. Al superar un
+límite, la API responde `429 RATE_LIMITED` con `Retry-After` antes de leer el cuerpo
+o llamar al proveedor. La IP procede de `X-Forwarded-For`, que Vercel sobrescribe en
+su edge para impedir que el cliente la falsifique
+([request headers](https://vercel.com/docs/headers/request-headers#x-forwarded-for)).
+
+Los contadores viven en la memoria de cada instancia: frenan un bucle de un mismo
+origen, pero no son un límite global entre instancias concurrentes. Para un tope
+estricto, añade una regla de WAF Rate Limiting sobre `POST /api/chat`, disponible en
+todos los planes con una regla por proyecto en Hobby
+([WAF Rate Limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)),
+o un almacén compartido.
 
 ## Comprobación
 

@@ -13,6 +13,18 @@ const MAX_MESSAGE_CHARACTERS = 2_000;
 const MAX_RESPONSE_CHARACTERS = 4_000;
 const AVAILABILITY_TIMEOUT_MS = 5_000;
 const CHAT_TIMEOUT_MS = 16_000;
+const SHORT_RETRY_SECONDS = 60;
+
+const FAILURE_MESSAGE = "The assistant could not answer. Please try again.";
+const SHORT_RATE_LIMIT_MESSAGE = "Too many messages in a short time. Please wait a minute and try again.";
+const LONG_RATE_LIMIT_MESSAGE = "The assistant has reached its message limit. Please try again later.";
+
+function rateLimitMessage(response: Response): string {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After"));
+  return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > SHORT_RETRY_SECONDS
+    ? LONG_RATE_LIMIT_MESSAGE
+    : SHORT_RATE_LIMIT_MESSAGE;
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -186,6 +198,7 @@ function mountChatWidget(root: HTMLElement): void {
 
     const request = new AbortController();
     chatRequest = request;
+    let failureMessage = FAILURE_MESSAGE;
     try {
       const response = await fetchWithTimeout(
         "/api/chat",
@@ -209,6 +222,7 @@ function mountChatWidget(root: HTMLElement): void {
         || payload.message.length > MAX_RESPONSE_CHARACTERS
       ) {
         if (response.status === 503) setAvailability("unavailable");
+        if (response.status === 429) failureMessage = rateLimitMessage(response);
         throw new Error("invalid_response");
       }
 
@@ -223,7 +237,7 @@ function mountChatWidget(root: HTMLElement): void {
       pendingMessage.remove();
       input.value = text;
       if (chatRequest !== request) return;
-      errorMessage.textContent = "The assistant could not answer. Please try again.";
+      errorMessage.textContent = failureMessage;
       errorMessage.hidden = false;
       status.textContent = availability === "available"
         ? "Your message was not sent."
