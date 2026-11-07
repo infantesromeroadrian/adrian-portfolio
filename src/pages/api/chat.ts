@@ -9,6 +9,7 @@ function chatEnvironment() {
   return {
     OLLAMA_API_KEY: getSecret("OLLAMA_API_KEY"),
     OLLAMA_MODEL: getSecret("OLLAMA_MODEL"),
+    CHAT_ENABLED: getSecret("CHAT_ENABLED"),
   };
 }
 
