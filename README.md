@@ -68,12 +68,19 @@ prerenderiza como HTML estático y solo el endpoint se ejecuta bajo demanda con
 el adaptador de Vercel. Configura las variables del servidor a partir de
 `.env.example`:
 
-- `OLLAMA_API_KEY` es obligatoria para habilitar el chat.
+- `OLLAMA_API_KEY` es obligatoria para habilitar el chat. Debe ser una clave
+  **dedicada a este portfolio** (ver «Clave dedicada»), nunca la personal.
 - `OLLAMA_MODEL` es opcional y ya incluye el modelo predeterminado en el ejemplo.
+- `CHAT_ENABLED` es el interruptor de apagado: con `false` (también `0`, `off`, `no`)
+  `GET /api/chat` responde `{"available":false}` y `POST` devuelve 503 sin llamar al
+  proveedor. Cámbiala en Vercel y redespliega; no requiere cambios de código.
 
 La API acepta únicamente JSON y conversaciones de hasta ocho mensajes, con un
-máximo de 2.000 caracteres por mensaje y 32 KiB por petición. Valida origen y
-metadatos `Sec-Fetch-Site`, aplica un timeout de 12 segundos, limita la respuesta
+máximo de 2.000 caracteres por mensaje y 32 KiB por petición. Un `POST` debe llevar un
+`Origin` idéntico al del sitio o, si el navegador lo omite, `Sec-Fetch-Site: same-origin`;
+en otro caso responde 403. Esto frena el uso desde otros sitios, no a un script, que
+puede enviar esas cabeceras: por eso existen los límites de frecuencia y el interruptor.
+Aplica aplica un timeout de 12 segundos, limita la respuesta
 del proveedor a 64 KiB y entrega como máximo 4.000 caracteres. Las respuestas no
 se almacenan en caché y los errores públicos no incluyen datos del proveedor.
 
@@ -90,6 +97,53 @@ estricto, añade una regla de WAF Rate Limiting sobre `POST /api/chat`, disponib
 todos los planes con una regla por proyecto en Hobby
 ([WAF Rate Limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)),
 o un almacén compartido.
+
+### Clave dedicada y despliegue (pasos manuales)
+
+1. En Ollama, crea una clave exclusiva para el portfolio (nombre sugerido
+   `portfolio-chat`), distinta de las que usan otros servicios, para poder revocarla
+   sin afectar a nada más. Nunca la pegues en el chat ni en el repositorio.
+2. En Vercel → Project → Settings → Environment Variables, define `OLLAMA_API_KEY`
+   (marcada como Sensitive) y `CHAT_ENABLED=true` en Production y Preview.
+3. En Vercel → Firewall → Configure → Custom Rules, crea una regla de **Rate Limit**
+   con estos valores exactos:
+   - Condiciones: `Request Method` es `POST` **y** `Request Path` es igual a `/api/chat`.
+   - Clave de límite: IP.
+   - Umbral y ventana: 10 peticiones por 60 segundos (el código ya aplica 5 por minuto
+     por IP; la regla es la red de seguridad del edge, no sustituye al código).
+   - Acción: Deny (429).
+   - Publica la regla («Review Changes» → «Publish») y comprueba en el panel de
+     Firewall que aparece activa.
+   Limitación: el tope diario de 300 mensajes del código es **por instancia**, no
+   global. Con varias instancias concurrentes el total diario puede superarlo; el
+   límite global real es la regla WAF por ventana, el interruptor `CHAT_ENABLED` y la
+   cuota de la clave dedicada.
+4. Para cortar el chat de inmediato: `CHAT_ENABLED=false` y redespliegue, o revoca la
+   clave en Ollama.
+
+### Defensas del asistente
+
+El prompt de sistema no es una frontera de seguridad. Además de sus reglas
+(`ASSISTANT_RULES`), `src/lib/chat-output-guard.ts` revisa cada respuesta antes de
+entregarla y la sustituye por un mensaje fijo si repite el prompt, contiene URLs o
+dominios no publicados, datos de contacto, empleadores o certificaciones que no constan
+en los hechos públicos, adopta otra identidad, incluye marcado activo o lenguaje
+ofensivo. Los turnos `assistant` que envía el cliente pasan el mismo filtro: uno que el
+servicio no pudo producir se rechaza con 400. No puede demostrar que un texto libre sea
+cierto; por eso la evaluación siguiente mide lo que sí consigue un atacante.
+
+### Evaluación de jailbreak e inyección
+
+```sh
+node eval/jailbreak/run.ts --backend stub --runs 3
+node eval/jailbreak/run.ts --backend ollama-local --model <modelo-local> --runs 5
+```
+
+Compara el prompt anterior (`baseline`) con el flujo actual (`hardened`) sobre
+`eval/jailbreak/attacks.json`. Los detectores son deterministas (marcadores sintéticos,
+solapamiento con el prompt, afirmaciones falsas, expresiones regulares). El script solo
+usa un Ollama local; una medición remota exige `--allow-remote` y una clave de
+evaluación en `EVAL_OLLAMA_KEY`. Resultados en `eval/jailbreak/results/`.
 
 ## Comprobación
 
