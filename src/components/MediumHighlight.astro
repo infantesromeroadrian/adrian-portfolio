@@ -10,21 +10,18 @@ import { securityWriteUps } from "../lib/public-work";
     </p>
   </header>
 
-  <ol class="write-up-cards" role="list">
-    {securityWriteUps.map((writeUp, index) => (
+  <ol class="write-up-list" role="list">
+    {securityWriteUps.map((writeUp) => (
       <li>
-        <article class="write-up-card">
-          <p class="write-up-card__scope">
-            <span aria-hidden="true">{String(index + 1).padStart(2, "0")} / </span>
-            {writeUp.scope}
-          </p>
+        <article class="write-up-row">
+          <p class="write-up-row__scope">{writeUp.scope}</p>
           <h3>
             <a href={writeUp.href} target="_blank" rel="noopener noreferrer">
               {writeUp.title}<span class="visually-hidden"> (opens in a new tab)</span>
               <span aria-hidden="true"> ↗</span>
             </a>
           </h3>
-          <p class="write-up-card__takeaway">{writeUp.takeaway}</p>
+          <p class="write-up-row__takeaway">{writeUp.takeaway}</p>
         </article>
       </li>
     ))}

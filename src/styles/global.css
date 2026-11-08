@@ -608,52 +608,51 @@ a:focus-visible {
   line-height: 1.45;
 }
 
-.architecture-plates {
+.architecture-feature {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(1.5rem, 3vw, 3rem);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: start;
+  gap: 1.75rem clamp(2rem, 4vw, 4rem);
 }
 
-.architecture-plates > li {
-  min-width: 0;
-  padding-top: 1.25rem;
-  border-top: 1px solid #b5b4ad;
-}
-
-.architecture-plate {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 1.25rem;
-  margin: 0;
-}
-
-.architecture-plate__caption {
+.architecture-feature__body,
+.architecture-row__body {
   min-width: 0;
 }
 
-.architecture-plate__number {
-  margin: 0 0 0.85rem;
+.architecture-feature__label,
+.architecture-case__kind {
+  margin: 0 0 1rem;
   color: #3e6577;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 0.9rem;
 }
 
-.architecture-plate__caption h3 {
+.architecture-feature h3,
+.architecture-row h4 {
   margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(1.65rem, 2.8vw, 2.5rem);
   font-weight: 500;
-  line-height: 1.03;
-  letter-spacing: -0.04em;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 
+.architecture-feature h3 {
+  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+}
+
+.architecture-feature h3 a {
+  text-decoration: none;
+}
+
+.architecture-feature h3 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
 .architecture-plate__decisions {
-  margin: 1rem 0 0;
+  margin: 1.25rem 0 0;
   color: #333a3e;
   font-size: 0.95rem;
   line-height: 1.55;
@@ -663,49 +662,40 @@ a:focus-visible {
   margin-top: 0.85rem;
 }
 
-.architecture-plate__decisions dt {
+.architecture-plate__decisions dt,
+.architecture-study__scope > span {
+  display: block;
   color: #3e6577;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.045em;
 }
 
 .architecture-plate__decisions dd {
   margin: 0.25rem 0 0;
 }
 
-.architecture-plate__scope {
-  margin: 1.5rem 0 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid #b5b4ad;
-}
-
-.architecture-plate__scope dt {
-  color: #3e6577;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
-}
-
-.architecture-plate__scope dd {
-  margin: 0.45rem 0 0;
+.architecture-study__scope {
+  margin: 1rem 0 0;
   color: #525b60;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   line-height: 1.5;
 }
 
-.architecture-plate__text-link {
-  display: inline-block;
+.architecture-study__scope > span {
+  margin-bottom: 0.2rem;
+}
+
+.architecture-study__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   min-height: 2.75rem;
-  margin-top: 0.85rem;
+  margin-top: 0.65rem;
   padding-block: 0.65rem;
   color: #3e6577;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   line-height: 1.4;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.3em;
+  text-underline-offset: 0.25em;
 }
 
 .architecture-plate__preview {
@@ -713,9 +703,8 @@ a:focus-visible {
   width: 100%;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #b5b4ad;
+  border: 1px solid #81817c;
   background: #f5f2eb;
-  transition: border-color 160ms ease, transform 160ms ease;
 }
 
 .architecture-plate__preview img {
@@ -724,23 +713,103 @@ a:focus-visible {
   height: auto;
 }
 
-.architecture-plate__preview:hover {
-  border-color: #111417;
-  transform: translateY(-0.18rem);
+:is(.aws-architect, .architecture-case, .medium-highlight, .certifications) a:focus-visible,
+.architecture-details summary:focus-visible {
+  outline: 2px solid #111417;
+  outline-offset: 0.3rem;
 }
 
-.architecture-plate__preview:focus-visible {
-  outline: 2px solid #111417;
-  outline-offset: 0.25rem;
+.architecture-feature__connection {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin: 0;
+  padding-block: 1.25rem;
+  border-block: 1px solid #b5b4ad;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.architecture-feature__connection > span {
+  color: #3e6577;
+  font-weight: 700;
+}
+
+.architecture-feature__connection a {
+  text-underline-offset: 0.25em;
+}
+
+.architecture-feature__connection small {
+  color: #525b60;
+  font-size: 0.85rem;
+}
+
+.architecture-index-title {
+  margin: 2.5rem 0 1.5rem;
+  color: #3d4b53;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.architecture-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.architecture-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: start;
+  gap: clamp(1.25rem, 3vw, 3rem);
+  padding-block: 1.75rem;
+  border-top: 1px solid #b5b4ad;
+}
+
+.architecture-row h4 {
+  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
+}
+
+.architecture-row__problem {
+  margin: 0.75rem 0 0;
+  max-width: 68ch;
+  color: #333a3e;
+  line-height: 1.5;
+}
+
+.architecture-details {
+  margin-top: 0.75rem;
+}
+
+.architecture-details summary {
+  width: fit-content;
+  min-height: 2.75rem;
+  padding-block: 0.65rem;
+  color: #3e6577;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.architecture-details .architecture-plate__decisions {
+  margin: 0.4rem 0 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #b5b4ad;
+}
+
+@media (max-width: 60rem) {
+  .architecture-feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 47.5rem) {
   .aws-architect__heading {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .aws-architect__heading {
     gap: 1rem;
+    margin-bottom: 2rem;
   }
 
   .aws-architect__folio-note {
@@ -751,36 +820,42 @@ a:focus-visible {
     font-size: clamp(3rem, 14vw, 4.75rem);
   }
 
-  .architecture-plates {
+  .architecture-row {
     grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-  }
-
-  .architecture-plate__number {
-    margin-bottom: 1rem;
-  }
-}
-
-@media (min-width: 47.501rem) and (max-width: 70rem) {
-  .architecture-plates {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .certifications {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 2fr);
+  gap: 1.5rem 3rem;
+  align-items: start;
   width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
   margin-inline: auto;
-  padding-block: clamp(3rem, 5vw, 4.5rem);
+  padding-block: 2.5rem;
   border-top: 1px solid #b5b4ad;
 }
 
 .certifications h2 {
-  margin: 0 0 clamp(2rem, 3vw, 3rem);
+  margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(2.8rem, 4.5vw, 4.25rem);
+  font-size: clamp(1.9rem, 2.5vw, 2.6rem);
   font-weight: 500;
   line-height: 0.95;
   letter-spacing: -0.065em;
+}
+
+.certifications .certification {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.certifications .certification h3 {
+  font-size: 1.35rem;
+}
+
+.certifications .certification-issuer {
+  margin-top: 0.5rem;
 }
 
 .certification-grid {
@@ -843,6 +918,12 @@ a:focus-visible {
   font-size: 0.85rem;
   font-weight: 700;
   line-height: 1.4;
+}
+
+@media (max-width: 60rem) {
+  .certifications {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 35rem) {
@@ -966,46 +1047,49 @@ a:focus-visible {
   line-height: 1.45;
 }
 
-.write-up-cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.75rem clamp(2rem, 5vw, 5rem);
+.write-up-list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.write-up-card {
-  padding-top: 1.25rem;
+.write-up-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 0.6rem clamp(2rem, 5vw, 5rem);
+  padding-block: 1.5rem;
   border-top: 1px solid #b5b4ad;
 }
 
-.write-up-card__scope {
-  margin: 0 0 0.85rem;
+.write-up-row__scope {
+  grid-column: 1 / -1;
+  margin: 0;
   color: #3e6577;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   line-height: 1.5;
 }
 
-.write-up-card h3 {
+.write-up-row h3 {
   margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(1.5rem, 2.6vw, 2.15rem);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
   font-weight: 500;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
-.write-up-card h3 a {
+.write-up-row h3 a {
+  display: inline-block;
+  min-height: 2.75rem;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
-.write-up-card__takeaway {
-  margin: 1rem 0 0;
+.write-up-row__takeaway {
+  margin: 0;
   color: #333a3e;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.55;
 }
 
@@ -1023,7 +1107,7 @@ a:focus-visible {
 
 @media (max-width: 47.5rem) {
   .medium-heading,
-  .write-up-cards {
+  .write-up-row {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -1685,5 +1769,130 @@ a:focus-visible {
   .site-navigation__toggle-lines span,
   .portfolio-chat__panel {
     transition: none;
+  }
+}
+
+
+.architecture-case {
+  width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+  margin-inline: auto;
+  padding-block: 5.5rem 3rem;
+}
+
+.architecture-case__header {
+  max-width: 60rem;
+}
+
+.architecture-case__kind {
+  margin-top: 2.5rem;
+}
+
+.architecture-case h1 {
+  max-width: 16ch;
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.architecture-case__lead {
+  max-width: 58ch;
+  margin: 1.75rem 0;
+  color: #333a3e;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  line-height: 1.5;
+}
+
+.architecture-case h2 {
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.architecture-case__summary {
+  margin-block: 3rem;
+  padding-block: 1.5rem;
+  border-block: 1px solid #b5b4ad;
+}
+
+.architecture-case__summary dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+  margin: 1.5rem 0 0;
+}
+
+.architecture-case__summary dt {
+  color: #3e6577;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.architecture-case__summary dd {
+  margin: 0.5rem 0 0;
+  color: #333a3e;
+  line-height: 1.55;
+}
+
+.architecture-case__figure {
+  max-width: 60rem;
+  margin: 0 auto 3rem;
+}
+
+.architecture-case__figure figcaption {
+  margin-top: 0.75rem;
+  color: #525b60;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.architecture-case__section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 1.5rem 3rem;
+  padding-block: 2.5rem;
+  border-top: 1px solid #b5b4ad;
+}
+
+.architecture-case__body {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 68ch;
+  color: #333a3e;
+  line-height: 1.6;
+}
+
+.architecture-case__body h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.architecture-case__body p {
+  margin: 0;
+}
+
+.architecture-case__body a {
+  text-underline-offset: 0.25em;
+}
+
+.architecture-case__note {
+  padding-left: 1rem;
+  border-left: 2px solid #b5b4ad;
+  color: #525b60;
+}
+
+@media (max-width: 47.5rem) {
+  .architecture-case__summary dl,
+  .architecture-case__section {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

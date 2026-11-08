@@ -97,3 +97,36 @@ export const architectureStudies = [
     previewAlt: "Architecture preview for an intake agent, case memory, a guarded copilot, an event bus to the operator desk, and redacted tracing",
   },
 ] satisfies readonly ArchitectureStudy[];
+
+
+// Editorial associations use public URLs so catalogue ordering stays independent.
+export const protectedAgentCase = {
+  href: "/work/protected-agent-runtime/",
+  studyHref: "/architecture/protected-agent-runtime.html",
+  relatedWriteUpHref: "https://medium.com/@infantesromeroadrian/doctrine-studio-a-prompt-is-not-a-permission-boundary-6d51785b9e4e",
+  context: "An agent can produce both a response for a person and a request to use a tool. This conceptual architecture separates content checks from the application's authority to execute an operation.",
+  boundaries: [
+    {
+      title: "Input and output",
+      description: "The map places an input check before Amazon Bedrock and an output check before a response leaves the runtime. Model output remains a candidate response until that boundary has been applied.",
+    },
+    {
+      title: "Tool authorization",
+      description: "A separate path checks schema and business rules before an operation reaches an external system. Content approval does not grant tool permissions.",
+    },
+    {
+      title: "Observability",
+      description: "The map includes sanitized telemetry for input and output decisions, without payloads. This describes the intended boundary; it does not demonstrate operational coverage.",
+    },
+  ],
+  evidence: "The interactive map is a conceptual architecture artifact. It shows components, boundaries and relationships; it is not evidence of a deployed system, a client implementation or measured security effectiveness.",
+} as const;
+
+const featuredStudy = architectureStudies.find((study) => study.href === protectedAgentCase.studyHref);
+const relatedWriteUp = securityWriteUps.find((writeUp) => writeUp.href === protectedAgentCase.relatedWriteUpHref);
+if (!featuredStudy || !relatedWriteUp) {
+  throw new Error("The protected agent case must reference an existing public study and write-up.");
+}
+
+export const protectedAgentStudy = featuredStudy;
+export const protectedAgentWriteUp = relatedWriteUp;

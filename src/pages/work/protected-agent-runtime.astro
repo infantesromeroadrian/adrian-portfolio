@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteNavigation from "../../components/SiteNavigation.astro";
+import ChatWidget from "../../components/ChatWidget.astro";
+import { protectedAgentCase as studyCase, protectedAgentStudy as study, protectedAgentWriteUp as writeUp } from "../../lib/public-work";
+---
+
+<BaseLayout title={`${study.title} — Adrian Infantes`} description={study.problem}>
+  <SiteNavigation homePath="/" />
+  <main class="architecture-case" id="case-top">
+    <header class="architecture-case__header">
+      <a class="architecture-study__link" href="/#aws-architect">← Back to Work</a>
+      <p class="architecture-case__kind">Conceptual architecture study</p>
+      <h1>{study.title}</h1>
+      <p class="architecture-case__lead">{studyCase.context}</p>
+      <p class="architecture-study__scope"><span>Technical scope</span>{study.scope}</p>
+    </header>
+
+    <section class="architecture-case__summary" aria-labelledby="case-summary-title">
+      <h2 id="case-summary-title">In 30 seconds</h2>
+      <dl>
+        <div><dt>Problem</dt><dd>{study.problem}</dd></div>
+        <div><dt>Decision</dt><dd>{study.decision}</dd></div>
+        <div><dt>Limitation</dt><dd>{study.limitation}</dd></div>
+      </dl>
+    </section>
+
+    <figure class="architecture-case__figure">
+      <a class="architecture-plate__preview" href={study.href} target="_blank" rel="noopener noreferrer" aria-label="Explore the protected agent runtime interactive map (opens in a new tab)">
+        <img src={study.preview} alt={study.previewAlt} width="960" height="600" decoding="async" />
+      </a>
+      <figcaption>Conceptual map: content checks and tool authorization are separate boundaries.</figcaption>
+    </figure>
+
+    <section class="architecture-case__section" aria-labelledby="case-boundaries-title">
+      <h2 id="case-boundaries-title">Where trust stops</h2>
+      <div class="architecture-case__body">
+        {studyCase.boundaries.map((boundary) => (
+          <div>
+            <h3>{boundary.title}</h3>
+            <p>{boundary.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="architecture-case__section" aria-labelledby="case-evidence-title">
+      <h2 id="case-evidence-title">What the evidence shows</h2>
+      <div class="architecture-case__body">
+        <p>{studyCase.evidence}</p>
+        <a class="architecture-study__link" href={study.href} target="_blank" rel="noopener noreferrer">
+          Explore interactive map <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="architecture-case__section" aria-labelledby="case-related-title">
+      <h2 id="case-related-title">A related attack lesson</h2>
+      <div class="architecture-case__body">
+        <h3><a href={writeUp.href} target="_blank" rel="noopener noreferrer">{writeUp.title}<span class="visually-hidden"> (opens in a new tab)</span></a></h3>
+        <p>{writeUp.takeaway}</p>
+        <p class="architecture-case__note">This write-up concerns a separate HTB challenge. The connection is thematic: it does not test or validate the runtime shown here.</p>
+      </div>
+    </section>
+    <a class="architecture-study__link" href="/#aws-architect">← Back to all architecture studies</a>
+  </main>
+  <footer class="portfolio-footer">
+    <a href="/">Adrian Infantes</a>
+    <a href="#case-top">Back to top</a>
+  </footer>
+  <ChatWidget />
+</BaseLayout>

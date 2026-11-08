@@ -1,13 +1,11 @@
 ---
+type Props = { homePath?: string };
+const { homePath = "" } = Astro.props;
 const destinations = [
-  { label: "Intro", href: "#intro-title" },
-  { label: "About", href: "#about-title" },
-  { label: "AWS Architect", href: "#aws-architect" },
-  { label: "Certifications", href: "#certifications" },
-  { label: "AI Red Teaming", href: "#ai-red-teaming" },
-  { label: "Write-ups", href: "#medium-title" },
+  { label: "Work", href: "#aws-architect" },
+  { label: "Red team", href: "#ai-red-teaming" },
+  { label: "Writing", href: "#medium-title" },
   { label: "Experience", href: "#experience" },
-  { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
 ] as const;
 ---
@@ -40,7 +38,7 @@ const destinations = [
     <ol class="site-navigation__list">
       {destinations.map((destination, index) => (
         <li>
-          <a href={destination.href}>
+          <a href={`${homePath}${destination.href}`}>
             <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
             {destination.label}
           </a>
@@ -52,7 +50,7 @@ const destinations = [
   <noscript>
     <nav class="site-navigation__fallback" aria-label="Portfolio sections">
       {destinations.map((destination) => (
-        <a href={destination.href}>{destination.label}</a>
+        <a href={`${homePath}${destination.href}`}>{destination.label}</a>
       ))}
     </nav>
   </noscript>
