@@ -10,13 +10,13 @@ type SecurityWriteUp = Readonly<{
 export const securityWriteUps = [
   {
     title: "Doctrine Studio: A Prompt Is Not a Permission Boundary",
-    takeaway: "Permission checks belong in the application. A model's instructions cannot replace them.",
+    takeaway: "Enforce permissions in application code, not in model instructions.",
     scope: "HTB challenge analysis and reproduction",
     href: "https://medium.com/@infantesromeroadrian/doctrine-studio-a-prompt-is-not-a-permission-boundary-6d51785b9e4e",
   },
   {
     title: "Power Supply: Sensitive Data Stays Sensitive Across Turns",
-    takeaway: "Data keeps its sensitivity throughout a conversation. Access checks must hold across turns.",
+    takeaway: "Re-check access on every turn, not only the first.",
     scope: "HTB challenge analysis and reproduction",
     href: "https://medium.com/@infantesromeroadrian/power-supply-sensitive-data-stays-sensitive-across-turns-c2c86ad4eead",
   },

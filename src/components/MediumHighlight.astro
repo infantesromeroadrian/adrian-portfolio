@@ -6,7 +6,7 @@ import { securityWriteUps } from "../lib/public-work";
   <header class="medium-heading">
     <h2 id="medium-title">AI Security Write-ups</h2>
     <p class="medium-introduction">
-      Four analyses of Hack The Box challenges, focused on defensive lessons and the limits of the evidence.
+      Four Hack The Box challenge analyses and reproductions, focused on defensive lessons and the limits of the evidence. Published on Medium.
     </p>
   </header>
 
@@ -14,11 +14,12 @@ import { securityWriteUps } from "../lib/public-work";
     {securityWriteUps.map((writeUp) => (
       <li>
         <article class="write-up-row">
-          <p class="write-up-row__scope">{writeUp.scope}</p>
+          {writeUp.scope === "Partial HTB challenge reproduction" && (
+            <p class="write-up-row__scope">Partial reproduction</p>
+          )}
           <h3>
             <a href={writeUp.href} target="_blank" rel="noopener noreferrer">
               {writeUp.title}<span class="visually-hidden"> (opens in a new tab)</span>
-              <span aria-hidden="true"> ↗</span>
             </a>
           </h3>
           <p class="write-up-row__takeaway">{writeUp.takeaway}</p>

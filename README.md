@@ -52,9 +52,11 @@ enlace al perfil y la credencial COAE con su identificador y enlace de
 verificación. Todos los destinos externos abren en una pestaña nueva con foco
 visible.
 
-AI Security Write-ups presenta cuatro análisis de retos HTB con enlaces directos a
-Medium y una conclusión defensiva por artículo; Sigma Technology conserva el
-alcance de reproducción parcial. Contact cierra la página con un enlace principal a
+AI Security Write-ups presenta cuatro análisis y reproducciones de retos HTB; la
+introducción indica que están publicados en Medium. Los títulos enlazan sin
+flechas y solo Sigma Technology muestra la etiqueta «Partial reproduction».
+Cada artículo conserva su conclusión defensiva y el alcance completo en el catálogo.
+Contact cierra la página con un enlace principal a
 LinkedIn, los perfiles públicos (Medium, LinkedIn, GitHub, X y Hack The Box) y una
 nota sobre la seguridad del asistente; no publica correo electrónico. Los artículos
 y estudios conceptuales comparten catálogo en `src/lib/public-work.ts` con los
