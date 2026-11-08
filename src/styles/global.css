@@ -1927,6 +1927,45 @@ a:focus-visible {
   text-underline-offset: 0.15em;
 }
 
+.harness-reference {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 1.25rem clamp(1.25rem, 3vw, 3rem);
+  padding-block: 2rem 0.5rem;
+  border-top: 1px solid #b5b4ad;
+  scroll-margin-top: 6rem;
+}
+
+.harness-reference h3 {
+  margin: 0;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.harness-reference__body {
+  min-width: 0;
+  max-width: 68ch;
+  color: #333a3e;
+  line-height: 1.55;
+}
+
+.harness-reference__body p {
+  margin: 0;
+}
+
+.harness-reference__body p + p {
+  margin-top: 0.85rem;
+}
+
+@media (max-width: 47.5rem) {
+  .harness-reference {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .conceptual-studies {
   margin-top: 1.5rem;
   padding-block: 1.25rem;

@@ -34,6 +34,11 @@ decisiones, ejemplo sintético estático y evidencia revisada el 8 de noviembre 
 2026 con sus límites. Los diagramas Archify explican el trabajo de forma
 simplificada; no son topologías literales de producción.
 
+Entre los cinco casos profesionales y los estudios conceptuales, `#arca-harness`
+enlaza el repositorio público del proyecto personal ARCA harness. La descripción
+resume su README; es una referencia al proyecto, no una auditoría del exportador
+ni una certificación de seguridad. No forma parte del catálogo profesional.
+
 Los cinco estudios conceptuales originales permanecen en un bloque desplegable
 nativo separado, con su contenido y URLs de mapas intactos. No representan
 retroactivamente implementaciones corporativas. El caso conceptual
