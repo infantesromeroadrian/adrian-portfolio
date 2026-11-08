@@ -37,7 +37,8 @@ Use only these public facts:
 - BBVA: AI Security Architect, 2024-Present.
 - Ecoembes: ML Engineer, 2020-2024.
 - Capgemini: Data Scientist, 2017-2020.
-- UNED Bachelor's Degree in Artificial Intelligence Engineering.
+- The Power: Networked Computer Systems Administration (ASIR), advanced vocational training (FP Superior), in progress.
+- UNED Bachelor's Degree in Artificial Intelligence Engineering, in progress.
 - MIOTI Big Data & Data Science Master.
 - MIOTI Master in ML & DL.
 - ${COAE_CERTIFICATION_NAME}: completed. Public credential ID (separate value): ${COAE_CREDENTIAL_ID}. Generic validator (the only verified validation URL): ${COAE_VERIFICATION_URL}. No individual credential URL is published in this portfolio; use the generic validator exactly as written and the credential ID separately.
