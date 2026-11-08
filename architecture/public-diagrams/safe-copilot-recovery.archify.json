@@ -1,0 +1,205 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Safe copilot recovery",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "animation": "none"
+  },
+  "lanes": [
+    {
+      "id": "turn",
+      "label": "A scoped conversational turn"
+    },
+    {
+      "id": "intervention",
+      "label": "On rejection",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "request",
+    "scope",
+    "context",
+    "copilot",
+    "check",
+    "response"
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "lane": "turn",
+      "col": 0,
+      "type": "external",
+      "label": "New request",
+      "sublabel": "One conversation",
+      "width": 150,
+      "height": 60,
+      "yOffset": 34
+    },
+    {
+      "id": "scope",
+      "lane": "turn",
+      "col": 1,
+      "type": "security",
+      "label": "Scope check",
+      "sublabel": "Reject cross-call access",
+      "width": 150,
+      "height": 60,
+      "yOffset": 34
+    },
+    {
+      "id": "context",
+      "lane": "turn",
+      "col": 2,
+      "type": "backend",
+      "label": "Bounded context",
+      "sublabel": "Exclude intervened lines",
+      "width": 150,
+      "height": 60,
+      "yOffset": 34
+    },
+    {
+      "id": "copilot",
+      "lane": "turn",
+      "col": 3,
+      "type": "cloud",
+      "label": "Copilot processing",
+      "sublabel": "Request-scoped input",
+      "width": 150,
+      "height": 60,
+      "yOffset": 34
+    },
+    {
+      "id": "check",
+      "lane": "turn",
+      "col": 4,
+      "type": "security",
+      "label": "Output decision",
+      "sublabel": "Hold candidate response",
+      "width": 150,
+      "height": 60,
+      "yOffset": 34
+    },
+    {
+      "id": "response",
+      "lane": "turn",
+      "col": 5,
+      "type": "frontend",
+      "label": "Allowed response",
+      "sublabel": "Return to operator",
+      "width": 150,
+      "height": 60,
+      "yOffset": 34
+    },
+    {
+      "id": "reject",
+      "lane": "intervention",
+      "col": 1,
+      "type": "security",
+      "label": "Fixed refusal",
+      "sublabel": "No model call",
+      "width": 150,
+      "height": 60,
+      "yOffset": 90
+    },
+    {
+      "id": "recover",
+      "lane": "intervention",
+      "col": 4,
+      "type": "backend",
+      "label": "Retain valid state",
+      "sublabel": "Discard blocked output",
+      "width": 150,
+      "height": 60,
+      "yOffset": 90
+    },
+    {
+      "id": "next",
+      "lane": "intervention",
+      "col": 5,
+      "type": "external",
+      "label": "Next turn",
+      "sublabel": "Evaluate afresh",
+      "width": 150,
+      "height": 60,
+      "yOffset": 90
+    }
+  ],
+  "edges": [
+    {
+      "id": "request-to-scope",
+      "from": "request",
+      "to": "scope",
+      "variant": "default"
+    },
+    {
+      "id": "scope-to-context",
+      "from": "scope",
+      "to": "context",
+      "variant": "default",
+      "label": "in scope"
+    },
+    {
+      "id": "context-to-copilot",
+      "from": "context",
+      "to": "copilot",
+      "variant": "default"
+    },
+    {
+      "id": "copilot-to-check",
+      "from": "copilot",
+      "to": "check",
+      "variant": "default"
+    },
+    {
+      "id": "check-to-response",
+      "from": "check",
+      "to": "response",
+      "variant": "default",
+      "label": "allow"
+    },
+    {
+      "id": "scope-to-reject",
+      "from": "scope",
+      "to": "reject",
+      "variant": "security",
+      "label": "other call",
+      "role": "error"
+    },
+    {
+      "id": "check-to-recover",
+      "from": "check",
+      "to": "recover",
+      "variant": "security",
+      "label": "block",
+      "role": "error",
+      "route": "auto"
+    },
+    {
+      "id": "recover-to-next",
+      "from": "recover",
+      "to": "next",
+      "variant": "default"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "The contribution",
+      "items": [
+        "Request-scoped checks and deterministic rejection.",
+        "Recovery preserves usable context after a blocked turn."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Reading this map",
+      "items": [
+        "Simplified implementation pattern; reviewed 8 Nov 2026.",
+        "Merged code and documented tests; production rollout not established."
+      ]
+    }
+  ]
+}

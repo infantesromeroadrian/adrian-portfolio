@@ -12,8 +12,9 @@ la maquetación reserva espacio superior para que el botón fijo del menú no ta
 kicker. Las portadas se sirven en WebP (480, 800 y 1122 px) con `srcset`; la
 profesional lleva `fetchpriority="high"` y la ofensiva carga con prioridad baja.
 
-El orden de la página es: Intro, AWS Architect, Certifications, AI Red Teaming,
-AI Security Write-ups, Experience/Education y Contact, seguido del pie. Experience
+El orden de la página es: Intro, trabajo profesional y estudios conceptuales,
+AI Red Teaming, AI Security Write-ups, Certifications, Experience/Education y
+Contact, seguido del pie. Experience
 y Education comparten un bloque editorial de dos columnas iguales, con encabezados
 alineados y un divisor central, también a 768 px; por debajo de 47,5 rem se apilan
 y el divisor pasa a ser horizontal. Experience muestra periodos profesionales.
@@ -23,10 +24,18 @@ hito; los dos ejes avanzan con scroll nativo. Todo el contenido permanece visibl
 sin JavaScript; con reduced-motion los ejes se muestran completos y los engranajes
 no giran.
 
-AWS Architect es un folio editorial de cinco láminas técnicas. Cada lámina expone problema,
-decisión, limitación y alcance técnico, con una miniatura WebP enlazada al mapa
-Archify interactivo en `/architecture/`. La galería muestra tres columnas en
-pantallas amplias, dos en tablet y una en móvil. No se publican nombres de
+El folio de trabajo destaca un caso profesional y presenta otros cuatro en filas
+con previews que enlazan a sus páginas. Los cinco relatos anonimizados se mantienen
+en `src/lib/professional-work.ts` y se generan mediante la plantilla compartida
+`src/pages/work/[slug].astro`. Cada caso distingue aportación propia y compartida,
+decisiones, ejemplo sintético estático y evidencia revisada el 8 de noviembre de
+2026 con sus límites. Los diagramas Archify explican el trabajo de forma
+simplificada; no son topologías literales de producción.
+
+Los cinco estudios conceptuales originales permanecen en un bloque desplegable
+nativo separado, con su contenido y URLs de mapas intactos. No representan
+retroactivamente implementaciones corporativas. El caso conceptual
+`/work/protected-agent-runtime/` sigue disponible. No se publican nombres de
 clientes, cuentas, repositorios ni recursos.
 
 Certifications reúne solo las dos credenciales de AWS en una retícula de dos
@@ -41,8 +50,9 @@ Medium y una conclusión defensiva por artículo; Sigma Technology conserva el
 alcance de reproducción parcial. Contact cierra la página con un enlace principal a
 LinkedIn, los perfiles públicos (Medium, LinkedIn, GitHub, X y Hack The Box) y una
 nota sobre la seguridad del asistente; no publica correo electrónico. Los artículos
-y casos AWS comparten catálogo en `src/lib/public-work.ts` con los hechos públicos
-del chat. Todo el contenido sigue siendo legible sin JavaScript.
+y estudios conceptuales comparten catálogo en `src/lib/public-work.ts` con los
+hechos públicos del chat. Los nuevos relatos profesionales tienen un catálogo
+separado y no amplían automáticamente el contexto del asistente. Todo el contenido sigue siendo legible sin JavaScript.
 
 El menú y el chat limitan su altura al espacio visible y permiten desplazamiento
 vertical. En vistas de poca altura, el chat utiliza casi toda la pantalla para
@@ -149,7 +159,7 @@ evaluación en `EVAL_OLLAMA_KEY`. Resultados en `eval/jailbreak/results/`.
 
 ```sh
 npm run build
-node --test src/lib/portfolio-chat.test.ts
+npm test
 ```
 
 La página principal no depende de fuentes, imágenes ni scripts remotos en

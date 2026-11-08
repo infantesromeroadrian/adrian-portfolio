@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Advisory LLM evaluation",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "animation": "none"
+  },
+  "lanes": [
+    {
+      "id": "assessment",
+      "label": "Advisory assessment"
+    },
+    {
+      "id": "veto",
+      "label": "Role and scope boundary",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "samples",
+    "generation",
+    "evaluation",
+    "scope",
+    "report",
+    "calibration"
+  ],
+  "nodes": [
+    {
+      "id": "samples",
+      "lane": "assessment",
+      "col": 0,
+      "type": "database",
+      "label": "Golden cases",
+      "sublabel": "Bounded reference set",
+      "width": 150,
+      "height": 78,
+      "yOffset": 34
+    },
+    {
+      "id": "generation",
+      "lane": "assessment",
+      "col": 1,
+      "type": "backend",
+      "label": "Candidate answer",
+      "sublabel": "Generation stage",
+      "width": 150,
+      "height": 78,
+      "yOffset": 34
+    },
+    {
+      "id": "evaluation",
+      "lane": "assessment",
+      "col": 2,
+      "type": "cloud",
+      "label": "Separate evaluator",
+      "sublabel": "Four dimensions",
+      "width": 150,
+      "height": 78,
+      "yOffset": 34
+    },
+    {
+      "id": "scope",
+      "lane": "assessment",
+      "col": 3,
+      "type": "security",
+      "label": "Role / scope veto",
+      "sublabel": "Fail closed on mismatch",
+      "width": 150,
+      "height": 78,
+      "yOffset": 34
+    },
+    {
+      "id": "report",
+      "lane": "assessment",
+      "col": 4,
+      "type": "backend",
+      "label": "Advisory report",
+      "sublabel": "Scores with limitations",
+      "width": 150,
+      "height": 78,
+      "yOffset": 34
+    },
+    {
+      "id": "calibration",
+      "lane": "assessment",
+      "col": 5,
+      "type": "external",
+      "label": "Human calibration",
+      "sublabel": "Required before gates",
+      "width": 150,
+      "height": 78,
+      "yOffset": 34
+    },
+    {
+      "id": "rejected",
+      "lane": "veto",
+      "col": 3,
+      "type": "security",
+      "label": "Vetoed result",
+      "sublabel": "Fluency cannot override",
+      "width": 150,
+      "height": 78,
+      "yOffset": 90
+    }
+  ],
+  "edges": [
+    {
+      "id": "samples-to-generation",
+      "from": "samples",
+      "to": "generation",
+      "variant": "default"
+    },
+    {
+      "id": "generation-to-evaluation",
+      "from": "generation",
+      "to": "evaluation",
+      "variant": "default",
+      "label": "evaluate"
+    },
+    {
+      "id": "evaluation-to-scope",
+      "from": "evaluation",
+      "to": "scope",
+      "variant": "default"
+    },
+    {
+      "id": "scope-to-report",
+      "from": "scope",
+      "to": "report",
+      "variant": "default",
+      "label": "in scope"
+    },
+    {
+      "id": "report-to-calibration",
+      "from": "report",
+      "to": "calibration",
+      "variant": "default"
+    },
+    {
+      "id": "scope-to-rejected",
+      "from": "scope",
+      "to": "rejected",
+      "variant": "security",
+      "label": "mismatch",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Independent assessment",
+      "items": [
+        "Generation and evaluation are separate stages.",
+        "A role or scope veto takes precedence over a score."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Evidence boundary",
+      "items": [
+        "Small golden sample exercised with Bedrock; reviewed 8 Nov 2026.",
+        "Advisory implementation, not calibrated quality or a blocking CI gate."
+      ]
+    }
+  ]
+}

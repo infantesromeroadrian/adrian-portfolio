@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Secure incremental RAG ingestion",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      680
+    ],
+    "animation": "none"
+  },
+  "stages": [
+    {
+      "label": "Source"
+    },
+    {
+      "label": "Detect changes"
+    },
+    {
+      "label": "Process"
+    },
+    {
+      "label": "Record outcome"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "documents",
+      "type": "external",
+      "label": "Documents",
+      "sublabel": "Source metadata",
+      "stage": 0,
+      "row": 0,
+      "width": 120,
+      "height": 76
+    },
+    {
+      "id": "version",
+      "type": "backend",
+      "label": "Version check",
+      "sublabel": "Opaque change token",
+      "stage": 1,
+      "row": 0,
+      "width": 160,
+      "height": 76
+    },
+    {
+      "id": "loader",
+      "type": "backend",
+      "label": "Document loader",
+      "sublabel": "Preserve job contract",
+      "stage": 2,
+      "row": 0,
+      "width": 160,
+      "height": 76
+    },
+    {
+      "id": "record",
+      "type": "database",
+      "label": "Version record",
+      "sublabel": "Consistent persistence",
+      "stage": 3,
+      "row": 0,
+      "width": 160,
+      "height": 76
+    },
+    {
+      "id": "skip",
+      "type": "backend",
+      "label": "No update",
+      "sublabel": "Unchanged source",
+      "stage": 1,
+      "row": 2,
+      "width": 160,
+      "height": 76
+    },
+    {
+      "id": "failure",
+      "type": "security",
+      "label": "Classify failure",
+      "sublabel": "No raw payloads",
+      "stage": 2,
+      "row": 2,
+      "width": 160,
+      "height": 76
+    },
+    {
+      "id": "outcome",
+      "type": "backend",
+      "label": "Job outcome",
+      "sublabel": "Safe error category",
+      "stage": 3,
+      "row": 2,
+      "width": 160,
+      "height": 76
+    }
+  ],
+  "flows": [
+    {
+      "id": "documents-version",
+      "from": "documents",
+      "to": "version",
+      "label": "metadata",
+      "variant": "default"
+    },
+    {
+      "id": "version-loader",
+      "from": "version",
+      "to": "loader",
+      "label": "changed",
+      "variant": "emphasis"
+    },
+    {
+      "id": "loader-record",
+      "from": "loader",
+      "to": "record",
+      "label": "success",
+      "variant": "default"
+    },
+    {
+      "id": "version-skip",
+      "from": "version",
+      "to": "skip",
+      "label": "unchanged",
+      "variant": "default",
+      "labelDy": 60
+    },
+    {
+      "id": "loader-failure",
+      "from": "loader",
+      "to": "failure",
+      "label": "failure",
+      "variant": "security",
+      "labelDy": 60
+    },
+    {
+      "id": "failure-outcome",
+      "from": "failure",
+      "to": "outcome",
+      "label": "safe status",
+      "variant": "default",
+      "labelDy": -32
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Change-aware ingestion",
+      "items": [
+        "Opaque version tracking with a timestamp fallback.",
+        "Only successful processing advances the stored version."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Evidence boundary",
+      "items": [
+        "Merged implementation and regression tests; reviewed 8 Nov 2026.",
+        "This map does not establish retrieval quality or production rollout."
+      ]
+    }
+  ]
+}

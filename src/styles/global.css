@@ -1896,3 +1896,139 @@ a:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Professional work and conceptual studies share the folio, not the same evidence status. */
+.architecture-row h4 a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.conceptual-studies {
+  margin-top: 1.5rem;
+  padding-block: 1.25rem;
+  border-block: 1px solid #b5b4ad;
+}
+
+.conceptual-studies > summary,
+.conceptual-study > summary {
+  min-height: 2.75rem;
+  padding-block: 0.65rem;
+  cursor: pointer;
+}
+
+.conceptual-studies > summary {
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  line-height: 1.3;
+}
+
+.conceptual-studies > summary span {
+  display: block;
+  margin: 0.45rem 0 0 1.4rem;
+  color: #525b60;
+  font-family: "Aptos", "Segoe UI", Arial, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.conceptual-studies summary:focus-visible {
+  outline: 2px solid #111417;
+  outline-offset: 0.3rem;
+}
+
+.conceptual-studies__introduction {
+  max-width: 65ch;
+  margin-block: 1rem 1.5rem;
+  color: #333a3e;
+  line-height: 1.55;
+}
+
+.conceptual-studies__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conceptual-study {
+  border-top: 1px solid #b5b4ad;
+}
+
+.conceptual-study > summary {
+  color: #3e6577;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.conceptual-study__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: start;
+  gap: 1.5rem 2rem;
+  padding-block: 1rem 1.5rem;
+}
+
+.conceptual-study__body > div {
+  min-width: 0;
+}
+
+.conceptual-study__body .architecture-plate__decisions {
+  margin-top: 0;
+}
+
+.conceptual-study__body .architecture-study__link {
+  margin-right: 1rem;
+}
+
+.professional-case h1 {
+  max-width: 18ch;
+  overflow-wrap: anywhere;
+}
+
+.professional-case .architecture-case__figure figcaption .architecture-study__link {
+  display: flex;
+  width: fit-content;
+  margin-top: 0.25rem;
+}
+
+.professional-case__example {
+  padding-left: 1.25rem;
+  border-left: 2px solid #3e6577;
+}
+
+.professional-case__review-date {
+  color: #3e6577;
+  font-size: 0.9rem;
+}
+
+.professional-case__navigation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 3rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid #b5b4ad;
+}
+
+.professional-case__navigation a {
+  min-width: 0;
+  padding-block: 0.75rem;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.3;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.professional-case__navigation span {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #3e6577;
+  font-family: "Aptos", "Segoe UI", Arial, sans-serif;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 47.5rem) {
+  .conceptual-study__body,
+  .professional-case__navigation {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

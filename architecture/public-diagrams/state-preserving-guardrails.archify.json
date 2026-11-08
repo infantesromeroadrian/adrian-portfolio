@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "State-preserving guardrails",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1040,
+      850
+    ],
+    "animation": "none"
+  },
+  "participants": [
+    {
+      "id": "person",
+      "type": "external",
+      "label": "Person",
+      "sublabel": "Conversation"
+    },
+    {
+      "id": "app",
+      "type": "backend",
+      "label": "Application",
+      "sublabel": "Controls the turn"
+    },
+    {
+      "id": "guard",
+      "type": "security",
+      "label": "Guardrails",
+      "sublabel": "Input and output"
+    },
+    {
+      "id": "model",
+      "type": "cloud",
+      "label": "Language model",
+      "sublabel": "Candidate response"
+    },
+    {
+      "id": "state",
+      "type": "database",
+      "label": "Valid state",
+      "sublabel": "Turn and consent"
+    }
+  ],
+  "messages": [
+    {
+      "id": "step1",
+      "from": "person",
+      "to": "app",
+      "y": 180,
+      "label": "request",
+      "variant": "default"
+    },
+    {
+      "id": "step2",
+      "from": "app",
+      "to": "guard",
+      "y": 225,
+      "label": "check input",
+      "variant": "security"
+    },
+    {
+      "id": "step3",
+      "from": "guard",
+      "to": "app",
+      "y": 270,
+      "label": "allow",
+      "variant": "return"
+    },
+    {
+      "id": "step4",
+      "from": "app",
+      "to": "model",
+      "y": 315,
+      "label": "generate",
+      "variant": "emphasis"
+    },
+    {
+      "id": "step5",
+      "from": "model",
+      "to": "app",
+      "y": 360,
+      "label": "candidate",
+      "variant": "return"
+    },
+    {
+      "id": "step6",
+      "from": "app",
+      "to": "guard",
+      "y": 405,
+      "label": "check output",
+      "variant": "security"
+    },
+    {
+      "id": "step7",
+      "from": "guard",
+      "to": "app",
+      "y": 450,
+      "label": "block",
+      "variant": "security"
+    },
+    {
+      "id": "step8",
+      "from": "app",
+      "to": "state",
+      "y": 495,
+      "label": "retain valid state only",
+      "variant": "default"
+    },
+    {
+      "id": "step9",
+      "from": "state",
+      "to": "app",
+      "y": 540,
+      "label": "state kept",
+      "variant": "return"
+    },
+    {
+      "id": "step10",
+      "from": "app",
+      "to": "person",
+      "y": 585,
+      "label": "blocked notice",
+      "variant": "return"
+    },
+    {
+      "id": "step11",
+      "from": "person",
+      "to": "app",
+      "y": 630,
+      "label": "next turn",
+      "variant": "default"
+    },
+    {
+      "id": "step12",
+      "from": "app",
+      "to": "state",
+      "y": 675,
+      "label": "read valid context",
+      "variant": "default"
+    },
+    {
+      "id": "step13",
+      "from": "state",
+      "to": "app",
+      "y": 720,
+      "label": "context",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "An output-blocked turn",
+      "items": [
+        "Blocked text is neither returned nor retained.",
+        "Valid turn and consent state remain available."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Evidence boundary",
+      "items": [
+        "Simplified rejected-response path; reviewed 8 Nov 2026.",
+        "Merged integration and tests; consumer rollout not verified."
+      ]
+    }
+  ]
+}

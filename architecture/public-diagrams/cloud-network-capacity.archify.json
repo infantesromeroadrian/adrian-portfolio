@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Cloud-network capacity assessment",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      700
+    ],
+    "animation": "none"
+  },
+  "components": [
+    {
+      "id": "probe",
+      "type": "external",
+      "label": "Controlled test",
+      "sublabel": "Development only",
+      "pos": [
+        60,
+        160
+      ],
+      "size": [
+        220,
+        80
+      ]
+    },
+    {
+      "id": "entry",
+      "type": "backend",
+      "label": "Workload entry",
+      "sublabel": "Alternative route used",
+      "pos": [
+        420,
+        160
+      ],
+      "size": [
+        220,
+        80
+      ]
+    },
+    {
+      "id": "workers",
+      "type": "cloud",
+      "label": "Application workload",
+      "sublabel": "Only the reached path",
+      "pos": [
+        780,
+        160
+      ],
+      "size": [
+        220,
+        80
+      ]
+    },
+    {
+      "id": "addresses",
+      "type": "cloud",
+      "label": "Subnet capacity",
+      "sublabel": "Available addresses",
+      "pos": [
+        780,
+        450
+      ],
+      "size": [
+        220,
+        80
+      ]
+    },
+    {
+      "id": "interfaces",
+      "type": "backend",
+      "label": "Interface inventory",
+      "sublabel": "Before / after counts",
+      "pos": [
+        420,
+        450
+      ],
+      "size": [
+        220,
+        80
+      ]
+    },
+    {
+      "id": "assessment",
+      "type": "external",
+      "label": "Capacity assessment",
+      "sublabel": "Measurements + limits",
+      "pos": [
+        60,
+        450
+      ],
+      "size": [
+        220,
+        80
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "probe-entry",
+      "from": "probe",
+      "to": "entry",
+      "label": "DEV requests",
+      "variant": "emphasis"
+    },
+    {
+      "id": "entry-workers",
+      "from": "entry",
+      "to": "workers",
+      "label": "reached work",
+      "variant": "default"
+    },
+    {
+      "id": "workers-addresses",
+      "from": "workers",
+      "to": "addresses",
+      "label": "uses network",
+      "variant": "default",
+      "labelDy": 100
+    },
+    {
+      "id": "addresses-interfaces",
+      "from": "addresses",
+      "to": "interfaces",
+      "label": "inventory",
+      "variant": "dashed"
+    },
+    {
+      "id": "interfaces-assessment",
+      "from": "interfaces",
+      "to": "assessment",
+      "label": "observations",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "What was assessed",
+      "items": [
+        "Network inventory and observations during a controlled DEV test.",
+        "Address availability and interface counts before and after."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "What the test cannot establish",
+      "items": [
+        "An alternate route and early rejections limited the workload reached.",
+        "No production-capacity claim; evidence reviewed 8 Nov 2026."
+      ]
+    }
+  ]
+}

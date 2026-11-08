@@ -30,17 +30,83 @@
   </a>
 
   <article class="certification htb-credential" aria-labelledby="coae-title">
-    <h3 id="coae-title">HTB Certified Offensive AI Expert (COAE)</h3>
-    <p class="certification-issuer">Hack The Box</p>
-    <p class="certification-credential">Credential ID: HTBCERT-1287C8C6C3</p>
+    <div class="coae-details">
+      <h3 id="coae-title">HTB Certified Offensive AI Expert (COAE)</h3>
+      <p class="certification-issuer">Hack The Box</p>
+      <p class="certification-credential">Credential ID: HTBCERT-1287C8C6C3</p>
+      <a
+        class="certification-link"
+        href="/certificates/htb-coae-adrian-infantes.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open original COAE certificate (PDF) <span aria-hidden="true">↗</span>
+        <span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+      <a
+        class="certification-link"
+        href="https://www.hackthebox.com/certificates"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Verify HTB Certified Offensive AI Expert (COAE) credential (opens in a new tab)"
+      >
+        Verify credential <span aria-hidden="true">↗</span>
+      </a>
+    </div>
     <a
-      class="certification-link"
-      href="https://www.hackthebox.com/certificates"
+      class="coae-preview"
+      href="/certificates/htb-coae-adrian-infantes.pdf"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Verify HTB Certified Offensive AI Expert (COAE) credential (opens in a new tab)"
+      aria-label="Open Adrian Infantes's original COAE certificate PDF (opens in a new tab)"
     >
-      Verify credential <span aria-hidden="true">↗</span>
+      <img
+        src="/images/coae-certificate-preview.webp"
+        alt="HTB Certified Offensive AI Expert certificate awarded to Adrián Infantes Romero on 18 September 2026"
+        width="1400"
+        height="990"
+        loading="lazy"
+        decoding="async"
+      />
     </a>
   </article>
 </section>
+
+<style>
+  .htb-credential {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    max-width: none;
+    align-items: start;
+  }
+
+  .coae-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .coae-preview {
+    display: block;
+    min-width: 0;
+    border: 1px solid #81817c;
+  }
+
+  .coae-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .coae-preview:focus-visible {
+    outline: 2px solid #111417;
+    outline-offset: 0.3rem;
+  }
+
+  @media (max-width: 47.5rem) {
+    .htb-credential {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

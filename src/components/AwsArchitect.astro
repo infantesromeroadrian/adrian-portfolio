@@ -1,71 +1,87 @@
 ---
-import {
-  architectureStudies,
-  protectedAgentCase,
-  protectedAgentStudy as featured,
-  protectedAgentWriteUp,
-} from "../lib/public-work";
+import { architectureStudies, protectedAgentCase } from "../lib/public-work";
+import { professionalCases, professionalCasePaths, FEATURED_PROFESSIONAL_SLUG } from "../lib/professional-work";
 
-const otherStudies = architectureStudies.filter((study) => study.href !== featured.href);
+const featured = professionalCases.find((study) => study.slug === FEATURED_PROFESSIONAL_SLUG);
+if (!featured) throw new Error("The featured professional case must exist in the catalogue.");
+const featuredPaths = professionalCasePaths(featured.slug);
+const otherCases = professionalCases.filter((study) => study.slug !== featured.slug);
 ---
 
 <section class="aws-architect" id="aws-architect" aria-labelledby="aws-architect-title">
   <header class="aws-architect__heading">
-    <p class="aws-architect__folio-note">Selected work / Five architecture studies</p>
-    <h2 id="aws-architect-title">AWS Architect</h2>
+    <p class="aws-architect__folio-note">Selected work / Five professional cases</p>
+    <h2 id="aws-architect-title">AI systems.<br />Clear boundaries.</h2>
     <p class="aws-architect__introduction">
-      Architectures for controlled, observable AI systems. Start with the boundary
-      between what a model says and what an application permits.
+      My work on safer AI applications, evaluation and cloud infrastructure.
+      Anonymized accounts of my contribution, the team's part and what the evidence supports.
     </p>
   </header>
 
   <article class="architecture-feature" aria-labelledby="featured-study-title">
-    <a class="architecture-plate__preview" href={protectedAgentCase.href} aria-label={`Read ${featured.title} architecture study`}>
-      <img src={featured.preview} alt={featured.previewAlt} width="960" height="600" loading="lazy" decoding="async" />
+    <a class="architecture-plate__preview" href={featuredPaths.page} aria-label={`Read ${featured.title}`}>
+      <img src={featuredPaths.preview} alt={featured.previewAlt} width="960" height="600" loading="lazy" decoding="async" />
     </a>
     <div class="architecture-feature__body">
-      <p class="architecture-feature__label">Featured study</p>
-      <h3 id="featured-study-title"><a href={protectedAgentCase.href}>{featured.title}</a></h3>
-      <dl class="architecture-plate__decisions">
-        <div><dt>Problem</dt><dd>{featured.problem}</dd></div>
-        <div><dt>Decision</dt><dd>{featured.decision}</dd></div>
-        <div><dt>Limitation</dt><dd>{featured.limitation}</dd></div>
-      </dl>
-      <p class="architecture-study__scope"><span>Technical scope</span>{featured.scope}</p>
-      <a class="architecture-study__link" href={protectedAgentCase.href}>Read the architecture study <span aria-hidden="true">→</span></a>
+      <p class="architecture-feature__label">Featured professional case</p>
+      <h3 id="featured-study-title"><a href={featuredPaths.page}>{featured.title}</a></h3>
+      <p class="architecture-row__problem">{featured.introduction}</p>
+      <p class="architecture-study__scope"><span>Scope</span>{featured.scope}</p>
+      <a class="architecture-study__link" href={featuredPaths.page}>Read the case <span aria-hidden="true">→</span></a>
     </div>
-    <p class="architecture-feature__connection">
-      <span>Related attack lesson</span>
-      <a href={protectedAgentWriteUp.href} target="_blank" rel="noopener noreferrer">
-        {protectedAgentWriteUp.title}<span class="visually-hidden"> (opens in a new tab)</span>
-      </a>
-      <small>A thematic connection, not validation of this runtime.</small>
-    </p>
   </article>
 
-  <h3 class="architecture-index-title">More architecture studies</h3>
+  <h3 class="architecture-index-title">More professional work</h3>
   <ul class="architecture-index" role="list">
-    {otherStudies.map((study) => (
-      <li class="architecture-row">
-        <a class="architecture-plate__preview" href={study.href} target="_blank" rel="noopener noreferrer" aria-label={`Explore ${study.title} interactive map (opens in a new tab)`}>
-          <img src={study.preview} alt={study.previewAlt} width="960" height="600" loading="lazy" decoding="async" />
-        </a>
-        <div class="architecture-row__body">
-          <h4>{study.title}</h4>
-          <p class="architecture-row__problem">{study.problem}</p>
-          <p class="architecture-study__scope"><span>Technical scope</span>{study.scope}</p>
-          <details class="architecture-details">
-            <summary>Decision and limitation<span class="visually-hidden"> for {study.title}</span></summary>
-            <dl class="architecture-plate__decisions">
-              <div><dt>Decision</dt><dd>{study.decision}</dd></div>
-              <div><dt>Limitation</dt><dd>{study.limitation}</dd></div>
-            </dl>
-          </details>
-          <a class="architecture-study__link" href={study.href} target="_blank" rel="noopener noreferrer">
-            Explore interactive map <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span>
+    {otherCases.map((study) => {
+      const paths = professionalCasePaths(study.slug);
+      return (
+        <li class="architecture-row">
+          <a class="architecture-plate__preview" href={paths.page} aria-label={`Read ${study.title}`}>
+            <img src={paths.preview} alt={study.previewAlt} width="960" height="600" loading="lazy" decoding="async" />
           </a>
-        </div>
-      </li>
-    ))}
+          <div class="architecture-row__body">
+            <h4><a href={paths.page}>{study.title}</a></h4>
+            <p class="architecture-row__problem">{study.introduction}</p>
+            <p class="architecture-study__scope"><span>Scope</span>{study.scope}</p>
+            <a class="architecture-study__link" href={paths.page}>Read the case <span aria-hidden="true">→</span></a>
+          </div>
+        </li>
+      );
+    })}
   </ul>
+
+  <details class="conceptual-studies">
+    <summary>Conceptual architecture studies <span>Five additional explorations</span></summary>
+    <p class="conceptual-studies__introduction">
+      These are separate design studies, not accounts of client implementations.
+      Each explains a problem, a decision and its limits through an interactive map.
+    </p>
+    <ul class="conceptual-studies__list" role="list">
+      {architectureStudies.map((study) => (
+        <li>
+          <details class="conceptual-study">
+            <summary>{study.title}</summary>
+            <div class="conceptual-study__body">
+              <a class="architecture-plate__preview" href={study.href} target="_blank" rel="noopener noreferrer" aria-label={`Explore ${study.title} conceptual map (opens in a new tab)`}>
+                <img src={study.preview} alt={study.previewAlt} width="960" height="600" loading="lazy" decoding="async" />
+              </a>
+              <div>
+                <dl class="architecture-plate__decisions">
+                  <div><dt>Problem</dt><dd>{study.problem}</dd></div>
+                  <div><dt>Decision</dt><dd>{study.decision}</dd></div>
+                  <div><dt>Limitation</dt><dd>{study.limitation}</dd></div>
+                </dl>
+                <p class="architecture-study__scope"><span>Technical scope</span>{study.scope}</p>
+                <a class="architecture-study__link" href={study.href} target="_blank" rel="noopener noreferrer">Explore interactive map <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                {study.href === protectedAgentCase.studyHref && (
+                  <a class="architecture-study__link" href={protectedAgentCase.href}>Read the conceptual study <span aria-hidden="true">→</span></a>
+                )}
+              </div>
+            </div>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </details>
 </section>

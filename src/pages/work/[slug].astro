@@ -1,0 +1,125 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteNavigation from "../../components/SiteNavigation.astro";
+import ChatWidget from "../../components/ChatWidget.astro";
+import { architectureStudies } from "../../lib/public-work";
+import { professionalCases, professionalCasePaths, type ProfessionalCase } from "../../lib/professional-work";
+
+export const getStaticPaths = (() => professionalCases.map((study) => ({
+  params: { slug: study.slug },
+  props: { study },
+}))) satisfies GetStaticPaths;
+
+type Props = { study: ProfessionalCase };
+const { study } = Astro.props;
+const paths = professionalCasePaths(study.slug);
+const position = professionalCases.findIndex((entry) => entry.slug === study.slug);
+const previous = professionalCases[position - 1];
+const next = professionalCases[position + 1];
+const relatedConcept = architectureStudies.find((entry) => entry.href === study.relatedConceptualHref);
+---
+
+<BaseLayout title={`${study.title} — Adrian Infantes`} description={study.introduction}>
+  <SiteNavigation homePath="/" />
+  <main class="architecture-case professional-case" id="case-top">
+    <header class="architecture-case__header">
+      <a class="architecture-study__link" href="/#aws-architect">← Back to Work</a>
+      <p class="architecture-case__kind">Professional case · Anonymized</p>
+      <h1>{study.title}</h1>
+      <p class="architecture-case__lead">{study.introduction}</p>
+      <p class="architecture-study__scope"><span>Scope</span>{study.scope}</p>
+    </header>
+
+    <section class="architecture-case__summary" aria-labelledby="case-summary-title">
+      <h2 id="case-summary-title">In 30 seconds</h2>
+      <dl>
+        <div><dt>Problem</dt><dd>{study.problem}</dd></div>
+        <div><dt>My contribution</dt><dd>{study.contribution.personal}</dd></div>
+        <div><dt>Evidence limit</dt><dd>{study.evidence.limitation}</dd></div>
+      </dl>
+    </section>
+
+    <figure class="architecture-case__figure">
+      <a class="architecture-plate__preview" href={paths.diagram} target="_blank" rel="noopener noreferrer" aria-label={`Explore the ${study.title} diagram (opens in a new tab)`}>
+        <img src={paths.preview} alt={study.previewAlt} width="960" height="600" decoding="async" />
+      </a>
+      <figcaption>
+        Simplified explanation of the work, not a literal production topology.
+        <a class="architecture-study__link" href={paths.diagram} target="_blank" rel="noopener noreferrer">Explore the full diagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+      </figcaption>
+    </figure>
+
+    <section class="architecture-case__section" aria-labelledby="case-context-title">
+      <h2 id="case-context-title">Problem and constraints</h2>
+      <div class="architecture-case__body">
+        <p>{study.problem}</p>
+        <p>{study.constraints}</p>
+      </div>
+    </section>
+
+    <section class="architecture-case__section" aria-labelledby="case-contribution-title">
+      <h2 id="case-contribution-title">My part in the work</h2>
+      <div class="architecture-case__body">
+        <p>{study.contribution.personal}</p>
+        <p>{study.contribution.shared}</p>
+      </div>
+    </section>
+
+    <section class="architecture-case__section" aria-labelledby="case-decisions-title">
+      <h2 id="case-decisions-title">Decisions in practice</h2>
+      <div class="architecture-case__body">
+        {study.decisions.map((decision) => (
+          <div>
+            <h3>{decision.title}</h3>
+            <p>{decision.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="architecture-case__section" aria-labelledby="case-example-title">
+      <h2 id="case-example-title">A synthetic example</h2>
+      <div class="architecture-case__body professional-case__example">
+        <p>{study.example.situation}</p>
+        <p>{study.example.behavior}</p>
+      </div>
+    </section>
+
+    <section class="architecture-case__section" aria-labelledby="case-evidence-title">
+      <h2 id="case-evidence-title">Evidence and limits</h2>
+      <div class="architecture-case__body">
+        <p class="professional-case__review-date">Evidence reviewed <time datetime={study.evidence.reviewedOn}>8 November 2026</time></p>
+        <p>{study.evidence.basis}</p>
+        <p class="architecture-case__note">{study.evidence.limitation}</p>
+        {relatedConcept && (
+          <p>
+            Related conceptual study: <a href={relatedConcept.href} target="_blank" rel="noopener noreferrer">{relatedConcept.title}<span class="visually-hidden"> (opens in a new tab)</span></a>.
+            This is a separate explanation of the topic, not evidence for this professional case.
+          </p>
+        )}
+      </div>
+    </section>
+
+    <nav class="professional-case__navigation" aria-label="Professional cases">
+      {previous && (
+        <a href={professionalCasePaths(previous.slug).page} rel="prev">
+          <span>Previous case</span>
+          {previous.title}
+        </a>
+      )}
+      {next && (
+        <a href={professionalCasePaths(next.slug).page} rel="next">
+          <span>Next case</span>
+          {next.title}
+        </a>
+      )}
+    </nav>
+    <a class="architecture-study__link" href="/#aws-architect">← Back to all work</a>
+  </main>
+  <footer class="portfolio-footer">
+    <a href="/">Adrian Infantes</a>
+    <a href="#case-top">Back to top</a>
+  </footer>
+  <ChatWidget />
+</BaseLayout>
