@@ -19,8 +19,8 @@ y Education comparten un bloque editorial de dos columnas iguales, con encabezad
 alineados y un divisor central, también a 768 px; por debajo de 47,5 rem se apilan
 y el divisor pasa a ser horizontal. Experience muestra periodos profesionales.
 Education muestra ASIR (FP Superior) en The Power, el grado de UNED y los dos
-programas de MIOTI, en ese orden. ASIR y UNED indican «In progress»; ninguna entrada
-académica publica fechas. Cada mecanismo combina
+programas de MIOTI, en ese orden. Ninguna entrada académica publica fechas ni
+estado de finalización. Cada mecanismo combina
 una rueda principal y una satélite que giran en sentidos opuestos al alcanzar el
 hito; los dos ejes avanzan con scroll nativo. Todo el contenido permanece visible
 sin JavaScript; con reduced-motion los ejes se muestran completos y los engranajes

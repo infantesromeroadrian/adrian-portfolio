@@ -3,7 +3,6 @@ type EducationMilestone = {
   organisation: string;
   title: string;
   description: string;
-  status?: "In progress";
 };
 
 type ExperienceMilestone = EducationMilestone & {
@@ -45,13 +44,11 @@ const timelines = [
         organisation: "The Power",
         title: "Networked Computer Systems Administration (ASIR)",
         description: "Advanced vocational training (FP Superior) in network and systems administration.",
-        status: "In progress",
       },
       {
         organisation: "UNED",
         title: "Bachelor’s Degree in Artificial Intelligence Engineering",
-        description: "Current undergraduate studies in artificial intelligence engineering.",
-        status: "In progress",
+        description: "Undergraduate studies in artificial intelligence engineering.",
       },
       {
         organisation: "MIOTI",
@@ -98,9 +95,6 @@ const gearPoints = (teeth: number) => Array.from({ length: teeth * 4 }, (_, inde
           <div class="milestone-content">
             {"date" in milestone && (
               <time class="milestone-date" datetime={milestone.date}>{milestone.label}</time>
-            )}
-            {"status" in milestone && milestone.status && (
-              <p class="milestone-status">{milestone.status}</p>
             )}
             <p class="milestone-organisation">{milestone.organisation}</p>
             <h3>{milestone.title}</h3>

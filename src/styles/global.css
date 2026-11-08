@@ -428,16 +428,11 @@ a:focus-visible {
   transform: rotate(-45deg);
 }
 
-.milestone-date,
-.milestone-status {
+.milestone-date {
   display: block;
   color: #525b60;
   font-size: 0.85rem;
   line-height: 1.4;
-}
-
-.milestone-status {
-  margin: 0;
 }
 
 .milestone-organisation {
@@ -466,8 +461,7 @@ a:focus-visible {
   line-height: 1.5;
 }
 
-.milestone-date + .milestone-organisation,
-.milestone-status + .milestone-organisation {
+.milestone-date + .milestone-organisation {
   margin-top: 0.85rem;
 }
 
