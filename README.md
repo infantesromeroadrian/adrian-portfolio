@@ -193,6 +193,17 @@ por el modelo para construir tarjetas. El cliente solo importa tipos y límites,
 renderiza texto inerte y valida los enlaces del contrato antes de hacerlos navegables.
 El historial conserva únicamente texto e IDs; sigue siendo entrada no confiable.
 
+Tras validar la respuesta completa, el cliente revela su texto de forma progresiva:
+entre 350 y 1800 ms de animación, con el mismo tope de 1800 ms para 4000 caracteres.
+El revelado respeta grafemas y ofrece «Show full answer» / «Mostrar respuesta
+completa»; con movimiento reducido muestra todo inmediatamente. Los lectores de
+pantalla reciben una única versión completa, sin anunciar cada fragmento. Cerrar
+el panel, enviar otra pregunta o activar movimiento reducido termina el efecto y
+conserva el turno íntegro; las tarjetas se crean una sola vez. No se mueve el foco
+al completar ni se fuerza el scroll en cada frame. Es presentación local después
+de validar, no streaming del proveedor ni una reducción de la latencia de inferencia;
+`stream: false` permanece en el backend.
+
 COAE mantiene su respuesta determinista con identificador y verificador separados,
 sin llamada al proveedor. Los programas educativos no implican una titulación
 obtenida. Las tarjetas distinguen experiencia profesional, conceptos y HTB; una

@@ -1,5 +1,7 @@
 import { mountPortfolioOrb } from "./portfolio-orb";
 import { fetchJsonWithTimeout } from "../lib/chat-transport";
+import { createTextReveal } from "../lib/chat-reveal";
+import type { TextReveal } from "../lib/chat-reveal";
 import {
   MAX_CHAT_MESSAGES as MAX_HISTORY_MESSAGES,
   MAX_USER_CHARACTERS as MAX_MESSAGE_CHARACTERS,
@@ -12,7 +14,7 @@ import {
 import type { ChatCopyKey } from "../lib/chat-presentation";
 
 type AvailabilityState = "checking" | "available" | "unavailable";
-type StatusKey = "checking" | "ready" | "unavailable" | "preparing" | "received" | "noAnswer";
+type StatusKey = "checking" | "ready" | "unavailable" | "preparing" | "revealing" | "received" | "noAnswer";
 type ChatError = { kind: "failure" | "timeout" | "rateLimit"; retrySeconds?: number };
 
 const SURFACE_OPEN_EVENT = "portfolio:surface-open";
@@ -52,6 +54,8 @@ function mountChatWidget(root: HTMLElement): void {
   let busy = false;
   let open = false;
   let history: ChatMessage[] = [];
+  let answerReveal: TextReveal | undefined;
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   let availabilityRequest: AbortController | undefined;
   let chatRequest: {
     controller: AbortController;
@@ -139,6 +143,7 @@ function mountChatWidget(root: HTMLElement): void {
   const closePanel = (returnFocus: boolean): void => {
     if (!open) return;
     open = false;
+    answerReveal?.finish();
     const activeAvailabilityRequest = availabilityRequest;
     availabilityRequest = undefined;
     activeAvailabilityRequest?.abort();
@@ -214,19 +219,71 @@ function mountChatWidget(root: HTMLElement): void {
     return item;
   };
 
+  const revealAnswer = (article: HTMLElement, content: HTMLElement, text: string): void => {
+    const showFull = copyElement("button", "showFullAnswer") as HTMLButtonElement;
+    showFull.type = "button";
+    showFull.className = "portfolio-chat__show-full";
+    showFull.dataset.chatShowFull = "";
+    content.before(showFull);
+    article.dataset.revealing = "true";
+
+    const reveal = createTextReveal(text, {
+      now: () => performance.now(),
+      request: (callback) => window.requestAnimationFrame(callback),
+      cancel: (id) => window.cancelAnimationFrame(id),
+    }, (visibleText) => {
+      if (answerReveal === reveal) content.textContent = visibleText;
+    }, () => {
+      if (answerReveal !== reveal) return;
+      answerReveal = undefined;
+      article.dataset.revealing = "false";
+      // A focused control stays in place until blur; completion never moves focus.
+      if (open && document.activeElement === showFull) {
+        showFull.setAttribute("aria-disabled", "true");
+        showFull.dataset.chatCopy = "fullAnswerShown";
+        showFull.textContent = CHAT_COPY[language].fullAnswerShown;
+        showFull.addEventListener("blur", () => showFull.remove(), { once: true });
+      } else {
+        showFull.remove();
+      }
+      if (statusKey === "revealing") setStatus("received");
+    });
+    answerReveal = reveal;
+    showFull.addEventListener("click", () => {
+      if (answerReveal === reveal) reveal.finish();
+    });
+    reveal.start();
+  };
+
   const renderMessage = (
     message: ChatMessage,
     pending = false,
     sources: readonly ChatSource[] = [],
     answerLanguage: ChatLanguage = language,
   ): HTMLElement => {
+    const followLatest = body.scrollHeight - body.scrollTop - body.clientHeight < 24;
     const article = document.createElement("article");
     article.dataset.role = message.role;
     const heading = copyElement("h3", message.role === "user" ? "user" : "assistant");
     const content = document.createElement("p");
-    content.textContent = message.content;
-    if (message.role === "assistant") content.lang = answerLanguage;
+    const progressive = message.role === "assistant" && !motionPreference.matches && !document.hidden;
+    content.textContent = progressive ? "" : message.content;
+    if (message.role === "assistant") {
+      content.lang = answerLanguage;
+      content.dataset.chatAnswer = "";
+      content.setAttribute("aria-hidden", "true");
+      content.setAttribute("aria-live", "off");
+    }
     article.append(heading, content);
+    if (message.role === "assistant") {
+      // The log receives one complete accessible answer, never animated fragments.
+      const accessibleAnswer = document.createElement("p");
+      accessibleAnswer.className = "visually-hidden";
+      accessibleAnswer.lang = answerLanguage;
+      accessibleAnswer.dataset.chatAccessibleAnswer = "";
+      accessibleAnswer.textContent = message.content;
+      article.append(accessibleAnswer);
+    }
     if (sources.length > 0) {
       const heading = copyElement("h4", "evidence");
       const cards = document.createElement("ul");
@@ -238,9 +295,10 @@ function mountChatWidget(root: HTMLElement): void {
     while (!pending && messages.childElementCount > MAX_HISTORY_MESSAGES) {
       messages.firstElementChild?.remove();
     }
+    if (progressive) revealAnswer(article, content, message.content);
     if (message.role === "assistant") {
-      // Keep the answer visible before its evidence, even when the cards are long.
-      body.scrollTop += article.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
+      // Follow only readers already at the latest turn; frames never change scroll.
+      if (followLatest) body.scrollTop += article.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
     } else {
       body.scrollTop = body.scrollHeight;
     }
@@ -306,6 +364,12 @@ function mountChatWidget(root: HTMLElement): void {
   window.addEventListener(SURFACE_OPEN_EVENT, (event) => {
     if (event instanceof CustomEvent && event.detail !== "chat") closePanel(false);
   });
+  motionPreference.addEventListener("change", (event) => {
+    if (event.matches) answerReveal?.finish();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) answerReveal?.finish();
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -317,6 +381,7 @@ function mountChatWidget(root: HTMLElement): void {
       || Array.from(text).length > MAX_MESSAGE_CHARACTERS
     ) return;
 
+    answerReveal?.finish();
     busy = true;
     setError();
     guide.open = false;
@@ -331,6 +396,7 @@ function mountChatWidget(root: HTMLElement): void {
     const request = { controller: new AbortController(), pendingMessage, text };
     chatRequest = request;
     let failure: ChatError = { kind: "failure" };
+    let answered = false;
     try {
       const { response, payload } = await fetchJsonWithTimeout(
         "/api/chat",
@@ -361,8 +427,9 @@ function mountChatWidget(root: HTMLElement): void {
         sourceIds: reply.sources.map((source) => source.id),
       };
       history = [...requestMessages, assistantMessage].slice(-MAX_HISTORY_MESSAGES);
+      answered = true;
       renderMessage(assistantMessage, false, reply.sources, requestLanguage);
-      setStatus("received");
+      setStatus(answerReveal ? "revealing" : "received");
     } catch (error) {
       if (chatRequest !== request) return;
       pendingMessage.remove();
@@ -374,7 +441,7 @@ function mountChatWidget(root: HTMLElement): void {
       chatRequest = undefined;
       busy = false;
       updateControls();
-      if (open) {
+      if (open && !answered) {
         (availability === "available" ? input : retryButton).focus({ preventScroll: true });
       }
     }

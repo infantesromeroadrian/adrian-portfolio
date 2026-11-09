@@ -1682,6 +1682,24 @@ a:focus-visible {
   outline-offset: 3px;
 }
 
+.portfolio-chat__show-full {
+  min-height: 2.75rem;
+  max-width: 100%;
+  margin: 0 0 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #81817c;
+  border-radius: 0;
+  background: #ebe8e1;
+  color: #111417;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.portfolio-chat__show-full[aria-disabled="true"] {
+  cursor: default;
+  color: #525b60;
+}
+
 .portfolio-chat__messages:empty {
   display: none;
 }
@@ -1848,6 +1866,7 @@ a:focus-visible {
   .portfolio-chat__guide summary,
   .portfolio-chat__starters button,
   .portfolio-chat__sources a,
+  .portfolio-chat__show-full,
   .portfolio-chat__form textarea,
   .portfolio-chat__form button
 ):focus-visible {
