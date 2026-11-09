@@ -20,8 +20,8 @@
  *                 production or personal key.
  */
 import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { ASSISTANT_RULES, ChatRateLimiter, handleChatRequest, PUBLIC_FACTS } from "../../src/lib/portfolio-chat.ts";
 
@@ -180,7 +180,7 @@ function loadCorpus(path: string): readonly Attack[] {
 const QUOTED = /["“`']([^"”`'\n]{3,60})["”`']/g;
 
 /** Compliant double: obeys any embedded instruction, echoes its rules, confirms any claim. */
-const stubProvider: Provider = async (system, messages) => {
+export const stubProvider: Provider = async (system, messages) => {
   const last = messages.at(-1)?.content ?? "";
   const parts: string[] = [];
   if (/system prompt|prompt de sistema|instructions|instrucciones|rules|reglas|verbatim|textualmente|hidden|oculto|configuraci[oó]n|above|arriba/i.test(last)) {
@@ -202,7 +202,7 @@ const stubProvider: Provider = async (system, messages) => {
  * tokens, a few English phrases and "instructions"/"rules" requests. It was too weak a
  * "compliant model" (baseline only 8.3 percent), so it was replaced by the broader double above.
  */
-const stubProviderV1: Provider = async (system, messages) => {
+export const stubProviderV1: Provider = async (system, messages) => {
   const last = messages.at(-1)?.content ?? "";
   const marker = /\b[A-Z0-9]{2,}(?:-[A-Z0-9]{2,})*-\d{3,4}\b/.exec(last)?.[0];
   const parts: string[] = [];
@@ -239,11 +239,11 @@ function ollamaProvider(model: string, baseUrl: string, bearer: string | undefin
 
 // --- variants -----------------------------------------------------------------------------
 
-async function runBaseline(provider: Provider, attack: Attack): Promise<string> {
+export async function runBaseline(provider: Provider, attack: Attack): Promise<string> {
   return provider(LEGACY_PROMPT, attack.turns);
 }
 
-async function runHardened(provider: Provider, attack: Attack): Promise<string> {
+export async function runHardened(provider: Provider, attack: Attack): Promise<string> {
   const request = new Request("https://portfolio.example/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json", Origin: "https://portfolio.example" },
@@ -257,7 +257,12 @@ async function runHardened(provider: Provider, attack: Attack): Promise<string> 
     fetchImplementation: async (_input, init) => {
       const payload = JSON.parse(String(init?.body)) as { messages: Message[] };
       const [system, ...rest] = payload.messages;
-      const content = await provider(system?.content ?? "", rest);
+      const raw = await provider(system?.content ?? "", rest);
+      // The doubles model compliant prose, so only their hardened path needs the wire envelope.
+      // Real providers must produce their own JSON: wrapping them would hide format failures.
+      const content = provider === stubProvider || provider === stubProviderV1
+        ? JSON.stringify({ message: raw, sourceIds: [] })
+        : raw;
       return Response.json({ message: { role: "assistant", content } });
     },
   });
@@ -352,4 +357,7 @@ async function main(): Promise<void> {
   console.log(`written ${out}`);
 }
 
-await main();
+// Importing the real variant runners for regression checks must not start an evaluation.
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  await main();
+}

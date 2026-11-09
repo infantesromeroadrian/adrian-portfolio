@@ -18,6 +18,11 @@ export async function fetchJsonWithTimeout(
     // Keep the deadline through body consumption, even if a transport ignores abort.
     const operation = async (): Promise<{ response: Response; payload: unknown }> => {
       const response = await fetch(input, { ...init, signal: controller.signal });
+      if (!response.ok) {
+        // Edge errors may be HTML. Keep HTTP metadata and never interpret that body.
+        void response.body?.cancel().catch(() => undefined);
+        return { response, payload: null };
+      }
       const payload: unknown = await response.json();
       return { response, payload };
     };

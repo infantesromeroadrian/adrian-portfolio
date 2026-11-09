@@ -71,8 +71,10 @@ Contact cierra la página con un enlace principal a
 LinkedIn, los perfiles públicos (Medium, LinkedIn, GitHub, X y Hack The Box) y una
 nota sobre la seguridad del asistente; no publica correo electrónico. Los artículos
 y estudios conceptuales comparten catálogo en `src/lib/public-work.ts` con los
-hechos públicos del chat. Los nuevos relatos profesionales tienen un catálogo
-separado y no amplían automáticamente el contexto del asistente. Todo el contenido sigue siendo legible sin JavaScript.
+hechos públicos del chat. Los relatos profesionales conservan su catálogo separado
+en `src/lib/professional-work.ts`; el asistente deriva su contexto de ambos catálogos
+mediante `chat-sources.ts`, con sus límites de evidencia. Todo el contenido del
+portfolio sigue siendo legible sin JavaScript.
 
 El botón del menú usa dos imágenes locales de Macintosh retro: arcoíris cerrado
 y terminal abierto, con un encuadre CSS fijo y sin cambiar la lógica de navegación.
@@ -103,10 +105,13 @@ el adaptador de Vercel. Configura las variables del servidor a partir de
 - `OLLAMA_API_KEY` es obligatoria para habilitar el chat. Debe ser una clave
   **dedicada a este portfolio** (ver «Clave dedicada»), nunca la personal.
 - `OLLAMA_MODEL` es opcional; el valor predeterminado y el ejemplo usan
-  `mistral-large-4`. Sustituye a `mistral-large-3:675b` tras la
-  [retirada de Mistral Large 3](https://ollama.com/library/mistral-large-3)
-  el 9 de noviembre de 2026. Una variable configurada prevalece sobre el valor
-  predeterminado: hay que actualizarla también en Vercel y redesplegar.
+  `deepseek-v4.1-flash`. La selección procede de una comparación acotada con
+  Mistral Large 4 y Nemotron 3 Super realizada el 9 de noviembre de 2026 sobre
+  respuestas EN/ES y JSON textual. Es evidencia de esa muestra, no una clasificación
+  universal de modelos. Una variable configurada prevalece sobre el valor
+  predeterminado: hay que actualizarla también en Vercel y redesplegar. La selección
+  local no demuestra que la clave de producción tenga acceso al modelo: se verifica
+  con una respuesta real tras el despliegue.
 - `CHAT_ENABLED` es el interruptor de apagado: con `false` (también `0`, `off`, `no`)
   `GET /api/chat` responde `{"available":false}` y `POST` devuelve 503 sin llamar al
   proveedor. Cámbiala en Vercel y redespliega; no requiere cambios de código.
@@ -116,12 +121,16 @@ habilitado. No realiza una consulta a Ollama ni demuestra que la clave, el model
 o la cuota permitan generar una respuesta.
 
 La API acepta únicamente JSON y conversaciones de hasta ocho mensajes, con un
-máximo de 2.000 caracteres por mensaje y 32 KiB por petición. Un `POST` debe llevar un
+máximo de 2.000 caracteres en turnos del usuario, 4.000 en respuestas del historial
+y 32 KiB por petición. `language` es opcional y solo admite `en` o `es`; si se omite,
+se pide responder en el idioma del visitante. Un `POST` debe llevar un
 `Origin` idéntico al del sitio o, si el navegador lo omite, `Sec-Fetch-Site: same-origin`;
 en otro caso responde 403. Esto frena el uso desde otros sitios, no a un script, que
 puede enviar esas cabeceras: por eso existen los límites de frecuencia y el interruptor.
-Aplica un timeout de 12 segundos, limita la respuesta
-del proveedor a 64 KiB y entrega como máximo 4.000 caracteres. Las respuestas no
+La lectura del cuerpo tiene un límite de 3 segundos; la llamada al proveedor,
+incluida la lectura de su respuesta, tiene otro de 12 segundos. La cancelación de la
+petición se propaga al proveedor. El cuerpo del proveedor se limita a 64 KiB y el
+texto entregado a 4.000 caracteres. Las respuestas no
 se almacenan en caché y los errores públicos no incluyen datos del proveedor.
 Ante un error HTTP del proveedor, el servidor registra únicamente el estado
 numérico y una categoría controlada para distinguir autenticación, acceso, modelo
@@ -131,52 +140,76 @@ conversaciones. La categoría orienta el diagnóstico a partir del estado HTTP y
 demuestra por sí sola la causa concreta.
 
 Cada cliente (una IPv4 o una red IPv6 /64) puede enviar 5 mensajes por minuto y 30
-al día, y cada instancia del servidor acepta como máximo 300 al día. Al superar un
-límite, la API responde `429 RATE_LIMITED` con `Retry-After` antes de leer el cuerpo
-o llamar al proveedor. La IP procede de `X-Forwarded-For`, que Vercel sobrescribe en
-su edge para impedir que el cliente la falsifique
+al día, y cada instancia acepta como máximo 300 al día. Además, admite una petición
+pendiente por cliente y cuatro por instancia, desde antes de leer el cuerpo hasta
+terminar o cancelar la respuesta. Todos los caminos liberan esa plaza en `finally`.
+Una saturación temporal devuelve `429 RATE_LIMITED` con `Retry-After: 2`; los límites
+de frecuencia devuelven el tiempo restante de su ventana, antes de leer el cuerpo
+o llamar al proveedor. Las direcciones del adaptador se validan como IP; las
+inválidas o ausentes comparten un único presupuesto conservador. No se usan cookies,
+IDs ni cabeceras elegidas por el visitante como identidad alternativa. La IP procede
+del contexto de Astro y de las cabeceras sobrescritas por el edge de Vercel
 ([request headers](https://vercel.com/docs/headers/request-headers#x-forwarded-for)).
 
-Los contadores viven en la memoria de cada instancia: frenan un bucle de un mismo
-origen, pero no son un límite global entre instancias concurrentes. Para un tope
-estricto, añade una regla de WAF Rate Limiting sobre `POST /api/chat`, disponible en
-todos los planes con una regla por proyecto en Hobby
-([WAF Rate Limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)),
-o un almacén compartido.
+Los contadores y plazas viven en memoria de cada instancia. No constituyen una cuota
+global entre instancias, reinicios, regiones o clientes. El WAF añade un límite antes
+de ejecutar la función, también con su propio alcance regional; un límite estricto
+global requeriría estado compartido. La cuota del proveedor sigue siendo independiente.
 
-### Clave dedicada y despliegue (pasos manuales)
+### Clave dedicada y protección del edge
 
-1. En Ollama, crea una clave exclusiva para el portfolio (nombre sugerido
-   `portfolio-chat`), distinta de las que usan otros servicios, para poder revocarla
-   sin afectar a nada más. Nunca la pegues en el chat ni en el repositorio.
-2. En Vercel → Project → Settings → Environment Variables, define `OLLAMA_API_KEY`
-   (marcada como Sensitive) y `CHAT_ENABLED=true` en Production y Preview.
-3. En Vercel → Firewall → Configure → Custom Rules, crea una regla de **Rate Limit**
-   con estos valores exactos:
-   - Condiciones: `Request Method` es `POST` **y** `Request Path` es igual a `/api/chat`.
-   - Clave de límite: IP.
-   - Umbral y ventana: 10 peticiones por 60 segundos (el código ya aplica 5 por minuto
-     por IP; la regla es la red de seguridad del edge, no sustituye al código).
-   - Acción: Deny (429).
-   - Publica la regla («Review Changes» → «Publish») y comprueba en el panel de
-     Firewall que aparece activa.
-   Limitación: el tope diario de 300 mensajes del código es **por instancia**, no
-   global. Con varias instancias concurrentes el total diario puede superarlo; el
-   límite global real es la regla WAF por ventana, el interruptor `CHAT_ENABLED` y la
-   cuota de la clave dedicada.
-4. Para cortar el chat de inmediato: `CHAT_ENABLED=false` y redespliegue, o revoca la
-   clave en Ollama.
+1. Usar una clave de Ollama exclusiva del portfolio, marcada como Sensitive en Vercel;
+   no sustituir una clave existente durante un cambio de modelo ni exponerla en el
+   navegador, logs o repositorio.
+2. Configurar `OLLAMA_MODEL` y `CHAT_ENABLED` para el entorno y redesplegar. La
+   disponibilidad de configuración no sustituye a una prueba real de generación.
+3. Política WAF prevista para este endpoint: método `POST` y rutas exactas `/api/chat`
+   o `/api/chat/`, clave IP, ventana fija de 10 peticiones por 60 segundos y alcance
+   regional en los alias del despliegue. GET y otras páginas quedan fuera. Comprobar
+   primero coincidencias con acción de registro, después publicar `rate_limit`
+   (HTTP 429). La acción `deny` devuelve 403 y no equivale a rate limiting.
+   [Referencia de WAF Rate Limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting).
+   Estos valores documentan la política: el código no activa el WAF. Su publicación
+   y estado efectivo deben verificarse por separado en la plataforma, sin confundir
+   un borrador con una regla activa. La protección DDoS de Vercel no se modifica.
+4. Para cortar el chat: `CHAT_ENABLED=false` y redespliegue, o revocar exclusivamente
+   su clave dedicada en Ollama.
+
+### Fuentes y respuesta del asistente
+
+`chat-sources.ts` deriva catorce fuentes de los catálogos públicos existentes: cinco
+casos profesionales, cinco estudios conceptuales y cuatro reproducciones de HTB.
+El contexto conserva contribución personal y compartida, decisiones y límites de
+evidencia. Los textos en primera persona pertenecen a Adrián; el asistente debe
+explicarlos en tercera persona y no atribuirse su trabajo. La fecha conocida es la
+revisión de evidencia de los casos profesionales, no una fecha de despliegue.
+
+El proveedor devuelve JSON textual `{message, sourceIds}` con hasta tres IDs únicos.
+Ollama Cloud no garantiza JSON Schema; se solicita el formato en el prompt, sin
+`format`, y se valida en aplicación. JSON inválido, campos extra, IDs desconocidos o
+una respuesta bloqueada producen el mensaje seguro sin tarjetas. El servidor resuelve
+los metadatos y enlaces, devuelve `{message, sources}` y nunca utiliza URLs generadas
+por el modelo para construir tarjetas. El cliente solo importa tipos y límites,
+renderiza texto inerte y valida los enlaces del contrato antes de hacerlos navegables.
+El historial conserva únicamente texto e IDs; sigue siendo entrada no confiable.
+
+COAE mantiene su respuesta determinista con identificador y verificador separados,
+sin llamada al proveedor. Los programas educativos no implican una titulación
+obtenida. Las tarjetas distinguen experiencia profesional, conceptos y HTB; una
+fuente válida no demuestra que cada afirmación del modelo esté respaldada.
 
 ### Defensas del asistente
 
 El prompt de sistema no es una frontera de seguridad. Además de sus reglas
-(`ASSISTANT_RULES`), `src/lib/chat-output-guard.ts` revisa cada respuesta antes de
-entregarla y la sustituye por un mensaje fijo si repite el prompt, contiene URLs o
+(`ASSISTANT_RULES`), `src/lib/chat-output-guard.ts` revisa el texto decodificado
+(después de validar JSON, nunca el envoltorio JSON ni los IDs) antes de entregarlo y la sustituye por un mensaje fijo si repite el prompt, contiene URLs o
 dominios no publicados, datos de contacto, empleadores o certificaciones que no constan
 en los hechos públicos, adopta otra identidad, incluye marcado activo o lenguaje
 ofensivo. Los turnos `assistant` que envía el cliente pasan el mismo filtro: uno que el
-servicio no pudo producir se rechaza con 400. No puede demostrar que un texto libre sea
-cierto; por eso la evaluación siguiente mide lo que sí consigue un atacante.
+falla esas comprobaciones se rechaza con 400. Este filtro no autentica el historial
+ni puede demostrar que un texto libre sea cierto. La evaluación histórica siguiente
+es complementaria; no verifica por sí sola el contrato JSON, las tarjetas ni el
+comportamiento del modelo actualmente desplegado.
 
 ### Evaluación de jailbreak e inyección
 

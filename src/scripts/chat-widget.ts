@@ -1,36 +1,23 @@
 import { mountPortfolioOrb } from "./portfolio-orb";
 import { fetchJsonWithTimeout } from "../lib/chat-transport";
-
-type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
+import {
+  MAX_CHAT_MESSAGES as MAX_HISTORY_MESSAGES,
+  MAX_USER_CHARACTERS as MAX_MESSAGE_CHARACTERS,
+} from "../lib/chat-contract";
+import type { ChatLanguage, ChatMessage, ChatSource } from "../lib/chat-contract";
+import {
+  CHAT_COPY, GUIDED_PROMPTS, formatSourceDate, isRecord, parseChatReply,
+  rateLimitMessage, retryAfterSeconds,
+} from "../lib/chat-presentation";
+import type { ChatCopyKey } from "../lib/chat-presentation";
 
 type AvailabilityState = "checking" | "available" | "unavailable";
+type StatusKey = "checking" | "ready" | "unavailable" | "preparing" | "received" | "noAnswer";
+type ChatError = { kind: "failure" | "timeout" | "rateLimit"; retrySeconds?: number };
 
 const SURFACE_OPEN_EVENT = "portfolio:surface-open";
-const MAX_HISTORY_MESSAGES = 8;
-const MAX_MESSAGE_CHARACTERS = 2_000;
-const MAX_RESPONSE_CHARACTERS = 4_000;
 const AVAILABILITY_TIMEOUT_MS = 5_000;
 const CHAT_TIMEOUT_MS = 16_000;
-const SHORT_RETRY_SECONDS = 60;
-
-const FAILURE_MESSAGE = "The assistant could not answer right now. Your draft is kept below. Please try again.";
-const TIMEOUT_MESSAGE = "The assistant took too long to respond. Your draft is kept below. Please try again.";
-const SHORT_RATE_LIMIT_MESSAGE = "Too many messages in a short time. Please wait a minute and try again.";
-const LONG_RATE_LIMIT_MESSAGE = "The assistant has reached its message limit. Please try again later.";
-
-function rateLimitMessage(response: Response): string {
-  const retryAfterSeconds = Number(response.headers.get("Retry-After"));
-  return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > SHORT_RETRY_SECONDS
-    ? LONG_RATE_LIMIT_MESSAGE
-    : SHORT_RATE_LIMIT_MESSAGE;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function mountChatWidget(root: HTMLElement): void {
   const panel = root.querySelector<HTMLElement>("[data-chat-panel]");
@@ -47,13 +34,21 @@ function mountChatWidget(root: HTMLElement): void {
   const count = root.querySelector<HTMLElement>("[data-chat-count]");
   const canvas = root.querySelector<HTMLCanvasElement>("[data-orb-canvas]");
   const pauseButton = root.querySelector<HTMLButtonElement>("[data-orb-pause]");
+  const languageSelect = root.querySelector<HTMLSelectElement>("[data-chat-language]");
+  const guide = root.querySelector<HTMLDetailsElement>("[data-chat-guide]");
+  const starters = root.querySelectorAll<HTMLButtonElement>("[data-chat-starter]");
   if (
     !panel || !toggle || !closeButton || !body || !status || !messages || !errorMessage
     || !form || !input || !submitButton || !count || !canvas || !pauseButton || !retryButton
+    || !languageSelect || !guide
   ) return;
 
-  const disposeOrb = mountPortfolioOrb(canvas, toggle, pauseButton);
+  let language: ChatLanguage = "en";
+  const disposeOrb = mountPortfolioOrb(canvas, toggle, pauseButton,
+    (paused) => CHAT_COPY[language][paused ? "resumeOrb" : "pauseOrb"]);
   let availability: AvailabilityState = "checking";
+  let statusKey: StatusKey = "checking";
+  let currentError: ChatError | undefined;
   let busy = false;
   let open = false;
   let history: ChatMessage[] = [];
@@ -64,8 +59,28 @@ function mountChatWidget(root: HTMLElement): void {
     text: string;
   } | undefined;
 
+  const renderFeedback = (): void => {
+    status.textContent = CHAT_COPY[language][statusKey];
+    errorMessage.hidden = currentError === undefined;
+    errorMessage.textContent = currentError
+      ? (currentError.kind === "rateLimit"
+        ? rateLimitMessage(language, currentError.retrySeconds)
+        : CHAT_COPY[language][currentError.kind])
+      : "";
+  };
+
+  const setStatus = (next: StatusKey): void => {
+    statusKey = next;
+    renderFeedback();
+  };
+
+  const setError = (next?: ChatError): void => {
+    currentError = next;
+    renderFeedback();
+  };
+
   const updateControls = (): void => {
-    const messageLength = input.value.length;
+    const messageLength = Array.from(input.value).length;
     input.disabled = availability !== "available" || busy;
     submitButton.disabled = (
       availability !== "available"
@@ -73,7 +88,8 @@ function mountChatWidget(root: HTMLElement): void {
       || input.value.trim().length === 0
       || messageLength > MAX_MESSAGE_CHARACTERS
     );
-    submitButton.textContent = busy ? "Sending…" : "Send";
+    submitButton.textContent = CHAT_COPY[language][busy ? "sending" : "send"];
+    starters.forEach((button) => { button.disabled = busy || availability !== "available"; });
     count.textContent = `${messageLength} / ${MAX_MESSAGE_CHARACTERS}`;
     panel.setAttribute("aria-busy", String(open && (busy || availability === "checking")));
   };
@@ -81,11 +97,7 @@ function mountChatWidget(root: HTMLElement): void {
   const setAvailability = (nextState: AvailabilityState): void => {
     availability = nextState;
     panel.dataset.availability = nextState;
-    if (nextState === "checking") status.textContent = "Checking availability…";
-    if (nextState === "available") status.textContent = "Ask about the public work in this portfolio.";
-    if (nextState === "unavailable") {
-      status.textContent = "The assistant is unavailable right now. Check availability again or browse the portfolio.";
-    }
+    setStatus(nextState === "available" ? "ready" : nextState);
     retryButton.hidden = nextState !== "unavailable";
     updateControls();
   };
@@ -96,7 +108,7 @@ function mountChatWidget(root: HTMLElement): void {
     availabilityRequest = request;
     previousRequest?.abort();
     const retryHadFocus = document.activeElement === retryButton;
-    errorMessage.hidden = true;
+    setError();
     setAvailability("checking");
 
     try {
@@ -108,6 +120,9 @@ function mountChatWidget(root: HTMLElement): void {
       );
       if (availabilityRequest !== request || request.signal.aborted) return;
       setAvailability(response.ok && isRecord(payload) && payload.available === true ? "available" : "unavailable");
+      if (response.status === 429) {
+        setError({ kind: "rateLimit", retrySeconds: retryAfterSeconds(response.headers.get("Retry-After"), Date.now()) });
+      }
     } catch {
       if (availabilityRequest !== request) return;
       setAvailability("unavailable");
@@ -138,7 +153,7 @@ function mountChatWidget(root: HTMLElement): void {
     updateControls();
     panel.hidden = true;
     toggle.setAttribute("aria-expanded", "false");
-    toggle.setAttribute("aria-label", "Open AI portfolio assistant");
+    toggle.setAttribute("aria-label", CHAT_COPY[language].open);
     if (returnFocus) toggle.focus({ preventScroll: true });
   };
 
@@ -148,26 +163,132 @@ function mountChatWidget(root: HTMLElement): void {
     open = true;
     panel.hidden = false;
     toggle.setAttribute("aria-expanded", "true");
-    toggle.setAttribute("aria-label", "Close AI portfolio assistant");
+    toggle.setAttribute("aria-label", CHAT_COPY[language].close);
     closeButton.focus({ preventScroll: true });
     void refreshAvailability();
   };
 
-  const renderMessage = (message: ChatMessage, pending = false): HTMLElement => {
+  const copyElement = (tag: string, key: ChatCopyKey): HTMLElement => {
+    const element = document.createElement(tag);
+    element.dataset.chatCopy = key;
+    element.textContent = CHAT_COPY[language][key];
+    element.lang = language;
+    return element;
+  };
+
+  const renderSource = (source: ChatSource): HTMLLIElement => {
+    const item = document.createElement("li");
+    const kind = copyElement("p", source.kind);
+    kind.className = "portfolio-chat__source-kind";
+    const link = document.createElement("a");
+    link.href = source.href;
+    const title = document.createElement("span");
+    title.lang = "en";
+    title.textContent = source.title;
+    link.append(title);
+    if (source.kind === "htb") {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      const notice = copyElement("span", "newTab");
+      notice.className = "visually-hidden";
+      link.append(document.createTextNode(" "), notice);
+    }
+    item.append(kind, link);
+    if (source.reviewedOn) {
+      const reviewed = document.createElement("p");
+      reviewed.className = "portfolio-chat__source-date";
+      const date = document.createElement("time");
+      date.dateTime = source.reviewedOn;
+      date.dataset.chatReviewed = source.reviewedOn;
+      date.textContent = formatSourceDate(source.reviewedOn, language);
+      reviewed.append(copyElement("span", "reviewed"), document.createTextNode(": "), date);
+      item.append(reviewed);
+    }
+    const limitation = document.createElement("p");
+    limitation.className = "portfolio-chat__source-limit";
+    const canonicalLimit = document.createElement("span");
+    canonicalLimit.lang = "en";
+    canonicalLimit.textContent = source.limitation;
+    limitation.append(copyElement("span", "limitation"), document.createTextNode(": "), canonicalLimit);
+    item.append(limitation);
+    return item;
+  };
+
+  const renderMessage = (
+    message: ChatMessage,
+    pending = false,
+    sources: readonly ChatSource[] = [],
+    answerLanguage: ChatLanguage = language,
+  ): HTMLElement => {
     const article = document.createElement("article");
     article.dataset.role = message.role;
-    const heading = document.createElement("h3");
-    heading.textContent = message.role === "user" ? "You" : "AI assistant";
+    const heading = copyElement("h3", message.role === "user" ? "user" : "assistant");
     const content = document.createElement("p");
     content.textContent = message.content;
+    if (message.role === "assistant") content.lang = answerLanguage;
     article.append(heading, content);
+    if (sources.length > 0) {
+      const heading = copyElement("h4", "evidence");
+      const cards = document.createElement("ul");
+      cards.className = "portfolio-chat__sources";
+      sources.forEach((source) => cards.append(renderSource(source)));
+      article.append(heading, cards);
+    }
     messages.append(article);
     while (!pending && messages.childElementCount > MAX_HISTORY_MESSAGES) {
       messages.firstElementChild?.remove();
     }
-    body.scrollTop = body.scrollHeight;
+    if (message.role === "assistant") {
+      // Keep the answer visible before its evidence, even when the cards are long.
+      body.scrollTop += article.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
+    } else {
+      body.scrollTop = body.scrollHeight;
+    }
     return article;
   };
+
+  const localizeInterface = (): void => {
+    const copy = CHAT_COPY[language];
+    languageSelect.value = language;
+    root.lang = language;
+    root.setAttribute("aria-label", copy.assistantLabel);
+    root.querySelectorAll<HTMLElement>("[data-chat-copy]").forEach((element) => {
+      const key = element.dataset.chatCopy as ChatCopyKey;
+      element.textContent = copy[key];
+      element.lang = language;
+    });
+    root.querySelectorAll<HTMLTimeElement>("[data-chat-reviewed]").forEach((element) => {
+      element.textContent = formatSourceDate(element.dateTime, language);
+    });
+    starters.forEach((button) => {
+      const starter = GUIDED_PROMPTS[language].find((entry) => entry.id === button.dataset.chatStarter);
+      if (starter) {
+        button.textContent = starter.label;
+        button.title = starter.prompt;
+      }
+    });
+    input.placeholder = copy.placeholder;
+    closeButton.setAttribute("aria-label", copy.close);
+    toggle.setAttribute("aria-label", open ? copy.close : copy.open);
+    messages.setAttribute("aria-label", copy.conversation);
+    pauseButton.textContent = copy[pauseButton.getAttribute("aria-pressed") === "true" ? "resumeOrb" : "pauseOrb"];
+    renderFeedback();
+    updateControls();
+  };
+
+  languageSelect.addEventListener("change", () => {
+    if (languageSelect.value !== "en" && languageSelect.value !== "es") return;
+    language = languageSelect.value;
+    localizeInterface();
+  });
+  starters.forEach((button) => button.addEventListener("click", () => {
+    if (busy || availability !== "available") return;
+    const starter = GUIDED_PROMPTS[language].find((entry) => entry.id === button.dataset.chatStarter);
+    if (!starter) return;
+    input.value = starter.prompt;
+    updateControls();
+    input.focus({ preventScroll: true });
+  }));
 
   toggle.addEventListener("click", () => {
     if (open) closePanel(true);
@@ -193,21 +314,23 @@ function mountChatWidget(root: HTMLElement): void {
       availability !== "available"
       || busy
       || text.length === 0
-      || text.length > MAX_MESSAGE_CHARACTERS
+      || Array.from(text).length > MAX_MESSAGE_CHARACTERS
     ) return;
 
     busy = true;
-    errorMessage.hidden = true;
+    setError();
+    guide.open = false;
+    const requestLanguage = language;
     const userMessage: ChatMessage = { role: "user", content: text };
     const requestMessages = [...history, userMessage].slice(-MAX_HISTORY_MESSAGES);
     const pendingMessage = renderMessage(userMessage, true);
     input.value = "";
-    status.textContent = "Preparing an answer…";
+    setStatus("preparing");
     updateControls();
 
     const request = { controller: new AbortController(), pendingMessage, text };
     chatRequest = request;
-    let failureMessage = FAILURE_MESSAGE;
+    let failure: ChatError = { kind: "failure" };
     try {
       const { response, payload } = await fetchJsonWithTimeout(
         "/api/chat",
@@ -217,42 +340,35 @@ function mountChatWidget(root: HTMLElement): void {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ messages: requestMessages }),
+          body: JSON.stringify({ messages: requestMessages, language: requestLanguage }),
         },
         request.controller,
         CHAT_TIMEOUT_MS,
       );
       if (chatRequest !== request || request.controller.signal.aborted) return;
-      if (
-        !response.ok
-        || !isRecord(payload)
-        || typeof payload.message !== "string"
-        || payload.message.trim().length === 0
-        || payload.message.length > MAX_RESPONSE_CHARACTERS
-      ) {
+      const reply = response.ok ? parseChatReply(payload) : undefined;
+      if (!reply) {
         if (response.status === 503) setAvailability("unavailable");
-        if (response.status === 429) failureMessage = rateLimitMessage(response);
+        if (response.status === 429) {
+          failure = { kind: "rateLimit", retrySeconds: retryAfterSeconds(response.headers.get("Retry-After"), Date.now()) };
+        }
         throw new Error("invalid_response");
       }
 
       const assistantMessage: ChatMessage = {
         role: "assistant",
-        content: payload.message.trim(),
+        content: reply.message,
+        sourceIds: reply.sources.map((source) => source.id),
       };
       history = [...requestMessages, assistantMessage].slice(-MAX_HISTORY_MESSAGES);
-      renderMessage(assistantMessage);
-      status.textContent = "Answer received. AI responses may be wrong.";
+      renderMessage(assistantMessage, false, reply.sources, requestLanguage);
+      setStatus("received");
     } catch (error) {
       if (chatRequest !== request) return;
       pendingMessage.remove();
       input.value = text;
-      errorMessage.textContent = error instanceof DOMException && error.name === "TimeoutError"
-        ? TIMEOUT_MESSAGE
-        : failureMessage;
-      errorMessage.hidden = false;
-      status.textContent = availability === "available"
-        ? "No answer was received. You can try again."
-        : "The assistant is unavailable.";
+      setError(error instanceof DOMException && error.name === "TimeoutError" ? { kind: "timeout" } : failure);
+      setStatus(availability === "available" ? "noAnswer" : "unavailable");
     } finally {
       if (chatRequest !== request) return;
       chatRequest = undefined;
@@ -272,7 +388,7 @@ function mountChatWidget(root: HTMLElement): void {
     }
   });
 
-  updateControls();
+  localizeInterface();
 }
 
 const chatRoot = document.querySelector<HTMLElement>("[data-portfolio-chat]");

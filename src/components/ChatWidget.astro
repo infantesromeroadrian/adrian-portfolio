@@ -1,4 +1,10 @@
-<aside class="portfolio-chat" aria-label="AI portfolio assistant" data-portfolio-chat>
+---
+import { CHAT_COPY, GUIDED_PROMPTS } from "../lib/chat-presentation";
+import { MAX_USER_CHARACTERS } from "../lib/chat-contract";
+const copy = CHAT_COPY.en;
+---
+
+<aside class="portfolio-chat" lang="en" aria-label={copy.assistantLabel} data-portfolio-chat>
   <section
     class="portfolio-chat__panel"
     id="portfolio-chat-panel"
@@ -12,40 +18,56 @@
   >
     <header class="portfolio-chat__header">
       <div>
-        <p class="portfolio-chat__eyebrow">Portfolio assistant</p>
-        <h2 id="portfolio-chat-title">Ask about the work</h2>
+        <p class="portfolio-chat__eyebrow" data-chat-copy="eyebrow">{copy.eyebrow}</p>
+        <h2 id="portfolio-chat-title" data-chat-copy="title">{copy.title}</h2>
       </div>
-      <button class="portfolio-chat__close" type="button" aria-label="Close AI assistant" data-chat-close>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18"></path>
-        </svg>
-      </button>
+      <div class="portfolio-chat__header-actions">
+        <label class="visually-hidden" for="portfolio-chat-language" data-chat-copy="language">{copy.language}</label>
+        <select id="portfolio-chat-language" class="portfolio-chat__language" data-chat-language>
+          <option value="en" lang="en" selected>EN</option>
+          <option value="es" lang="es">ES</option>
+        </select>
+        <button class="portfolio-chat__close" type="button" aria-label={copy.close} data-chat-close>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
     </header>
 
     <div class="portfolio-chat__body" data-chat-body>
-      <p class="portfolio-chat__notice" id="portfolio-chat-notice">
-        AI assistant. Answers come from public portfolio information and may be wrong.
-        This conversation is not persisted.
+      <details class="portfolio-chat__guide" open data-chat-guide>
+        <summary data-chat-copy="guide">{copy.guide}</summary>
+        <div class="portfolio-chat__starters">
+          {GUIDED_PROMPTS.en.map((starter) => (
+            <button type="button" data-chat-starter={starter.id} title={starter.prompt}>
+              {starter.label}
+            </button>
+          ))}
+        </div>
+      </details>
+      <p class="portfolio-chat__notice" id="portfolio-chat-notice" data-chat-copy="notice">
+        {copy.notice}
       </p>
       <details class="portfolio-chat__security">
-        <summary>How this assistant is secured</summary>
+        <summary data-chat-copy="security">{copy.security}</summary>
         <ul>
-          <li>Answers only from public portfolio facts.</li>
-          <li>Treats your messages as untrusted data.</li>
-          <li>Rate-limited per visitor.</li>
-          <li>Replies appear as plain text, never HTML, and nothing is stored.</li>
+          <li data-chat-copy="publicFacts">{copy.publicFacts}</li>
+          <li data-chat-copy="untrusted">{copy.untrusted}</li>
+          <li data-chat-copy="rateLimited">{copy.rateLimited}</li>
+          <li data-chat-copy="plainText">{copy.plainText}</li>
         </ul>
       </details>
       <p class="portfolio-chat__status" role="status" aria-live="polite" data-chat-status>
-        Checking availability…
+        {copy.checking}
       </p>
-      <button class="portfolio-chat__retry" type="button" hidden data-chat-retry>
-        Check availability again
+      <button class="portfolio-chat__retry" type="button" hidden data-chat-retry data-chat-copy="retry">
+        {copy.retry}
       </button>
       <div
         class="portfolio-chat__messages"
         role="log"
-        aria-label="Conversation with the portfolio assistant"
+        aria-label={copy.conversation}
         aria-live="polite"
         aria-relevant="additions"
         data-chat-messages
@@ -54,13 +76,13 @@
     </div>
 
     <form class="portfolio-chat__form" data-chat-form>
-      <label for="portfolio-chat-message">Your message</label>
+      <label for="portfolio-chat-message" data-chat-copy="inputLabel">{copy.inputLabel}</label>
       <textarea
         id="portfolio-chat-message"
         name="message"
         rows="2"
-        maxlength="2000"
-        placeholder="Ask about this portfolio"
+        maxlength={MAX_USER_CHARACTERS * 2}
+        placeholder={copy.placeholder}
         autocomplete="off"
         disabled
         data-chat-input
@@ -70,7 +92,7 @@
         <button type="submit" disabled data-chat-submit>Send</button>
       </div>
       <button class="portfolio-chat__pause" type="button" aria-pressed="false" data-orb-pause>
-        Pause orb motion
+        {copy.pauseOrb}
       </button>
     </form>
   </section>
@@ -78,7 +100,7 @@
   <button
     class="portfolio-chat__toggle"
     type="button"
-    aria-label="Open AI portfolio assistant"
+    aria-label={copy.open}
     aria-controls="portfolio-chat-panel"
     aria-expanded="false"
     data-chat-toggle
@@ -97,7 +119,7 @@
     <svg class="portfolio-chat__toggle-close" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M6 6l12 12M18 6L6 18"></path>
     </svg>
-    <span class="portfolio-chat__toggle-label">Ask AI</span>
+    <span class="portfolio-chat__toggle-label" data-chat-copy="toggle">{copy.toggle}</span>
   </button>
 
   <noscript>

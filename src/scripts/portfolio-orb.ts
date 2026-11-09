@@ -18,6 +18,7 @@ export function mountPortfolioOrb(
   canvas: HTMLCanvasElement,
   toggle: HTMLButtonElement,
   pauseButton: HTMLButtonElement,
+  pauseLabel: (paused: boolean) => string = (paused) => paused ? "Resume orb motion" : "Pause orb motion",
 ): () => void {
   const context = canvas.getContext("2d");
   if (!context) return () => undefined;
@@ -145,7 +146,7 @@ export function mountPortfolioOrb(
   pauseButton.addEventListener("click", () => {
     paused = !paused;
     pauseButton.setAttribute("aria-pressed", String(paused));
-    pauseButton.textContent = paused ? "Resume orb motion" : "Pause orb motion";
+    pauseButton.textContent = pauseLabel(paused);
     syncAnimation();
   }, { signal: listeners.signal });
   document.addEventListener("visibilitychange", syncAnimation, { signal: listeners.signal });

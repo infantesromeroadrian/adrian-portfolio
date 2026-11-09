@@ -13,7 +13,7 @@ export type ProfessionalCase = Readonly<{
   relatedConceptualHref?: string;
 }>;
 
-// Public, anonymized accounts; kept separate from the conceptual studies and chat facts.
+// Public, anonymized accounts; the chat derives its professional evidence from this catalogue.
 export const professionalCases: readonly ProfessionalCase[] = [
   {
     slug: "safe-copilot-recovery",

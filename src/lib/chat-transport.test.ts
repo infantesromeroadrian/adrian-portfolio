@@ -66,7 +66,7 @@ test("an already cancelled request never calls fetch", async (context) => {
 
 test("completed JSON preserves response metadata and clears the deadline", async (context) => {
   const response = Response.json({ message: "Public portfolio answer" }, {
-    status: 429,
+    status: 200,
     headers: { "Retry-After": "90" },
   });
   context.mock.method(globalThis, "fetch", async () => response);
@@ -77,4 +77,41 @@ test("completed JSON preserves response metadata and clears the deadline", async
   assert.deepEqual(result.payload, { message: "Public portfolio answer" });
   await new Promise((resolve) => setTimeout(resolve, 40));
   assert.equal(controller.signal.aborted, false);
+});
+
+for (const [format, body, contentType] of [
+  ["JSON", '{"error":"rate_limited"}', "application/json"],
+  ["plain text", "Please slow down", "text/plain"],
+  ["HTML", "<html><script>untrusted()</script></html>", "text/html"],
+  ["empty", "", "text/plain"],
+]) {
+  test(`HTTP 429 with ${format} preserves status and retry headers without exposing its body`, async (context) => {
+    const response = new Response(body, {
+      status: 429,
+      headers: { "Content-Type": contentType, "Retry-After": "2" },
+    });
+    context.mock.method(globalThis, "fetch", async () => response);
+    const result = await fetchJsonWithTimeout("/api/chat", {}, new AbortController(), 20);
+    assert.equal(result.response.status, 429);
+    assert.equal(result.response.headers.get("Retry-After"), "2");
+    assert.equal(result.payload, null);
+  });
+}
+
+test("an HTTP error cancels a stalled body without waiting for it", async (context) => {
+  let cancelled = false;
+  context.mock.method(globalThis, "fetch", async () => new Response(new ReadableStream({
+    cancel() { cancelled = true; },
+  }), { status: 429 }));
+  const controller = new AbortController();
+  const result = await bounded(fetchJsonWithTimeout("/api/chat", {}, controller, 20));
+  assert.equal(result.response.status, 429);
+  assert.equal(result.payload, null);
+  assert.equal(cancelled, true);
+  assert.equal(controller.signal.aborted, false);
+});
+
+test("non-JSON success remains an invalid response", async (context) => {
+  context.mock.method(globalThis, "fetch", async () => new Response("<html>Unexpected page</html>"));
+  await assert.rejects(fetchJsonWithTimeout("/api/chat", {}, new AbortController(), 20), SyntaxError);
 });
