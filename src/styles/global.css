@@ -2042,9 +2042,116 @@ a:focus-visible {
   margin-right: 1rem;
 }
 
+.professional-case {
+  padding-top: 4.5rem;
+}
+
+.professional-case .architecture-case__header {
+  max-width: none;
+}
+
+.professional-case .architecture-case__header > .architecture-study__link {
+  margin-top: 0;
+}
+
+.professional-case .architecture-case__kind {
+  margin-block: 1rem 0.75rem;
+}
+
 .professional-case h1 {
-  max-width: 18ch;
+  max-width: 28ch;
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
   overflow-wrap: anywhere;
+}
+
+.professional-case__overview {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 1rem 3rem;
+  align-items: start;
+  margin-top: 1.25rem;
+}
+
+.professional-case .architecture-case__lead {
+  margin: 0;
+  font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+  line-height: 1.5;
+}
+
+.professional-case__overview .architecture-study__scope {
+  margin: 0;
+}
+
+.professional-case__shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.professional-case__shortcuts a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: #3e6577;
+  font-size: 0.95rem;
+  text-underline-offset: 0.25em;
+}
+
+.professional-case :is(#case-decisions-title, #case-architecture, #case-evidence-title) {
+  scroll-margin-top: 6rem;
+}
+
+.professional-case .architecture-case__summary {
+  margin-block: 1.25rem 2.5rem;
+  padding-block: 1.25rem;
+}
+
+.professional-case .architecture-case__summary dl {
+  margin-top: 1rem;
+}
+
+.professional-case__decision-story {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  padding-block: 2.5rem;
+  border-top: 1px solid #b5b4ad;
+}
+
+.professional-case__decision-story .architecture-case__section {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border-top: 0;
+}
+
+.professional-case__decision-story h2 {
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.6rem, 2vw, 2rem);
+}
+
+.professional-case__decision-story .architecture-case__body {
+  gap: 1rem;
+}
+
+@media (max-width: 70rem) {
+  .professional-case__decision-story {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .professional-case__decision-story .architecture-case__section + .architecture-case__section {
+    padding-top: 2rem;
+    border-top: 1px solid #b5b4ad;
+  }
+}
+
+@media (max-width: 47.5rem) {
+  .professional-case__overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .professional-case .architecture-case__figure figcaption .architecture-study__link {

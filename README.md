@@ -32,7 +32,11 @@ en `src/lib/professional-work.ts` y se generan mediante la plantilla compartida
 `src/pages/work/[slug].astro`. Cada caso distingue aportación propia y compartida,
 decisiones, ejemplo sintético estático y evidencia revisada el 8 de noviembre de
 2026 con sus límites. Los diagramas Archify explican el trabajo de forma
-simplificada; no son topologías literales de producción.
+simplificada; no son topologías literales de producción. Las cinco páginas usan
+una cabecera compacta y atajos HTML a Decisions, Architecture y Evidence junto al
+resumen. Solo el caso Safe copilot recovery agrupa decisiones, ejemplo sintético y
+evidencia en bloques contiguos, seguidos del mapa explicativo; los otros cuatro
+conservan su secuencia. Los atajos funcionan sin JavaScript.
 
 Entre los cinco casos profesionales y los estudios conceptuales, `#arca-harness`
 enlaza el repositorio público del proyecto personal ARCA harness. La descripción

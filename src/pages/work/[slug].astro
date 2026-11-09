@@ -18,6 +18,12 @@ const position = professionalCases.findIndex((entry) => entry.slug === study.slu
 const previous = professionalCases[position - 1];
 const next = professionalCases[position + 1];
 const relatedConcept = architectureStudies.find((entry) => entry.href === study.relatedConceptualHref);
+const isRecoveryPilot = study.slug === "safe-copilot-recovery";
+type CaseSection = "architecture" | "context" | "contribution" | "decisions" | "example" | "evidence";
+// Keep the pilot's decision, illustrative behavior and evidence adjacent in reading order.
+const contentGroups: readonly (readonly CaseSection[])[] = isRecoveryPilot
+  ? [["context", "contribution"], ["decisions", "example", "evidence"], ["architecture"]]
+  : [["architecture", "context", "contribution", "decisions", "example", "evidence"]];
 ---
 
 <BaseLayout title={`${study.title} — Adrian Infantes`} description={study.introduction}>
@@ -27,8 +33,15 @@ const relatedConcept = architectureStudies.find((entry) => entry.href === study.
       <a class="architecture-study__link" href="/#aws-architect">← Back to Work</a>
       <p class="architecture-case__kind">Professional case · Anonymized</p>
       <h1>{study.title}</h1>
-      <p class="architecture-case__lead">{study.introduction}</p>
-      <p class="architecture-study__scope"><span>Scope</span>{study.scope}</p>
+      <div class="professional-case__overview">
+        <p class="architecture-case__lead">{study.introduction}</p>
+        <p class="architecture-study__scope"><span>Scope</span>{study.scope}</p>
+      </div>
+      <nav class="professional-case__shortcuts" aria-label="In this case">
+        <a href="#case-decisions-title">Decisions</a>
+        <a href="#case-architecture">Architecture</a>
+        <a href="#case-evidence-title">Evidence</a>
+      </nav>
     </header>
 
     <section class="architecture-case__summary" aria-labelledby="case-summary-title">
@@ -40,66 +53,81 @@ const relatedConcept = architectureStudies.find((entry) => entry.href === study.
       </dl>
     </section>
 
-    <figure class="architecture-case__figure">
-      <a class="architecture-plate__preview" href={paths.diagram} target="_blank" rel="noopener noreferrer" aria-label={`Explore the ${study.title} diagram (opens in a new tab)`}>
-        <img src={paths.preview} alt={study.previewAlt} width="960" height="600" decoding="async" />
-      </a>
-      <figcaption>
-        Simplified explanation of the work, not a literal production topology.
-        <a class="architecture-study__link" href={paths.diagram} target="_blank" rel="noopener noreferrer">Explore the full diagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
-      </figcaption>
-    </figure>
-
-    <section class="architecture-case__section" aria-labelledby="case-context-title">
-      <h2 id="case-context-title">Problem and constraints</h2>
-      <div class="architecture-case__body">
-        <p>{study.problem}</p>
-        <p>{study.constraints}</p>
-      </div>
-    </section>
-
-    <section class="architecture-case__section" aria-labelledby="case-contribution-title">
-      <h2 id="case-contribution-title">My part in the work</h2>
-      <div class="architecture-case__body">
-        <p>{study.contribution.personal}</p>
-        <p>{study.contribution.shared}</p>
-      </div>
-    </section>
-
-    <section class="architecture-case__section" aria-labelledby="case-decisions-title">
-      <h2 id="case-decisions-title">Decisions in practice</h2>
-      <div class="architecture-case__body">
-        {study.decisions.map((decision) => (
-          <div>
-            <h3>{decision.title}</h3>
-            <p>{decision.description}</p>
-          </div>
+    {contentGroups.map((group) => (
+      <div class:list={{ "professional-case__decision-story": isRecoveryPilot && group[0] === "decisions" }}>
+        {group.map((section) => (
+          <>
+            {section === "architecture" && (
+              <figure class="architecture-case__figure" id="case-architecture">
+                <a class="architecture-plate__preview" href={paths.diagram} target="_blank" rel="noopener noreferrer" aria-label={`Explore the ${study.title} diagram (opens in a new tab)`}>
+                  <img src={paths.preview} alt={study.previewAlt} width="960" height="600" decoding="async" />
+                </a>
+                <figcaption>
+                  Simplified explanation of the work, not a literal production topology.
+                  <a class="architecture-study__link" href={paths.diagram} target="_blank" rel="noopener noreferrer">Explore the full diagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                </figcaption>
+              </figure>
+            )}
+            {section === "context" && (
+              <section class="architecture-case__section" aria-labelledby="case-context-title">
+                <h2 id="case-context-title">Problem and constraints</h2>
+                <div class="architecture-case__body">
+                  <p>{study.problem}</p>
+                  <p>{study.constraints}</p>
+                </div>
+              </section>
+            )}
+            {section === "contribution" && (
+              <section class="architecture-case__section" aria-labelledby="case-contribution-title">
+                <h2 id="case-contribution-title">My part in the work</h2>
+                <div class="architecture-case__body">
+                  <p>{study.contribution.personal}</p>
+                  <p>{study.contribution.shared}</p>
+                </div>
+              </section>
+            )}
+            {section === "decisions" && (
+              <section class="architecture-case__section" aria-labelledby="case-decisions-title">
+                <h2 id="case-decisions-title">Decisions in practice</h2>
+                <div class="architecture-case__body">
+                  {study.decisions.map((decision) => (
+                    <div>
+                      <h3>{decision.title}</h3>
+                      <p>{decision.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+            {section === "example" && (
+              <section class="architecture-case__section" aria-labelledby="case-example-title">
+                <h2 id="case-example-title">A synthetic example</h2>
+                <div class="architecture-case__body professional-case__example">
+                  <p>{study.example.situation}</p>
+                  <p>{study.example.behavior}</p>
+                </div>
+              </section>
+            )}
+            {section === "evidence" && (
+              <section class="architecture-case__section" aria-labelledby="case-evidence-title">
+                <h2 id="case-evidence-title">Evidence and limits</h2>
+                <div class="architecture-case__body">
+                  <p class="professional-case__review-date">Evidence reviewed <time datetime={study.evidence.reviewedOn}>8 November 2026</time></p>
+                  <p>{study.evidence.basis}</p>
+                  <p class="architecture-case__note">{study.evidence.limitation}</p>
+                  {relatedConcept && (
+                    <p>
+                      Related conceptual study: <a href={relatedConcept.href} target="_blank" rel="noopener noreferrer">{relatedConcept.title}<span class="visually-hidden"> (opens in a new tab)</span></a>.
+                      This is a separate explanation of the topic, not evidence for this professional case.
+                    </p>
+                  )}
+                </div>
+              </section>
+            )}
+          </>
         ))}
       </div>
-    </section>
-
-    <section class="architecture-case__section" aria-labelledby="case-example-title">
-      <h2 id="case-example-title">A synthetic example</h2>
-      <div class="architecture-case__body professional-case__example">
-        <p>{study.example.situation}</p>
-        <p>{study.example.behavior}</p>
-      </div>
-    </section>
-
-    <section class="architecture-case__section" aria-labelledby="case-evidence-title">
-      <h2 id="case-evidence-title">Evidence and limits</h2>
-      <div class="architecture-case__body">
-        <p class="professional-case__review-date">Evidence reviewed <time datetime={study.evidence.reviewedOn}>8 November 2026</time></p>
-        <p>{study.evidence.basis}</p>
-        <p class="architecture-case__note">{study.evidence.limitation}</p>
-        {relatedConcept && (
-          <p>
-            Related conceptual study: <a href={relatedConcept.href} target="_blank" rel="noopener noreferrer">{relatedConcept.title}<span class="visually-hidden"> (opens in a new tab)</span></a>.
-            This is a separate explanation of the topic, not evidence for this professional case.
-          </p>
-        )}
-      </div>
-    </section>
+    ))}
 
     <nav class="professional-case__navigation" aria-label="Professional cases">
       {previous && (
