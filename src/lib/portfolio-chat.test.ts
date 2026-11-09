@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { SAFE_FALLBACK_MESSAGE } from "./chat-output-guard.ts";
-import { ChatConcurrencyLimiter, ChatRateLimiter, handleChatAvailability, handleChatRequest, SYSTEM_PROMPT } from "./portfolio-chat.ts";
+import { ASSISTANT_RULES, ChatConcurrencyLimiter, ChatRateLimiter, handleChatAvailability, handleChatRequest, PUBLIC_FACTS, SYSTEM_PROMPT } from "./portfolio-chat.ts";
 
 const testEnvironment = { OLLAMA_API_KEY: "synthetic-test-key" };
 
@@ -472,8 +472,41 @@ test("language is an enum and assistant source history round-trips 4000 characte
   assert.ok(!("format" in sent));
   assert.match(SYSTEM_PROMPT, /First-person.*Adrian/);
   assert.match(SYSTEM_PROMPT, /third person/);
-  assert.match(SYSTEM_PROMPT, /completion status is not published/);
-  assert.match(SYSTEM_PROMPT, /Do not infer or claim that a qualification has been awarded/);
+});
+
+test("education keeps exact public programme facts and places presentation and award-inference guidance in internal rules", () => {
+  const educationEntries = PUBLIC_FACTS.split("\n").filter((line) => /^- (?:The Power|UNED|MIOTI)/.test(line));
+  assert.deepEqual(educationEntries, [
+    "- The Power: Networked Computer Systems Administration (ASIR), advanced vocational training (FP Superior).",
+    "- UNED Bachelor's Degree in Artificial Intelligence Engineering.",
+    "- MIOTI Big Data & Data Science Master.",
+    "- MIOTI Master in ML & DL.",
+  ]);
+  assert.doesNotMatch(PUBLIC_FACTS, /completion status is not published|Do not infer or claim that a qualification has been awarded/);
+  assert.match(ASSISTANT_RULES, /Education presentation:/);
+  assert.match(ASSISTANT_RULES, /Do not add unsolicited/);
+  assert.match(ASSISTANT_RULES, /never infer completion, enrolment, progress or dates/);
+  assert.match(ASSISTANT_RULES, /explicitly asks about completion, graduation or whether a qualification was awarded/);
+  assert.match(ASSISTANT_RULES, /Stop after the list/);
+  assert.match(ASSISTANT_RULES, /answer that specific question in one short sentence/);
+  assert.match(ASSISTANT_RULES, /Preserve professional-case, conceptual-study and HTB evidence limits/);
+  assert.doesNotMatch(ASSISTANT_RULES, /Academic programme names do not establish/);
+});
+
+test("neutral education answers and a targeted graduation answer pass the response parser and content guard", async () => {
+  for (const [question, answer] of [
+    ["What is Adrian's educational background?", "Adrian's education covers AI Engineering at UNED, ASIR at The Power, and Big Data, Data Science, ML and DL at MIOTI."],
+    ["¿Cuál es la formación de Adrián?", "La formación de Adrián abarca Ingeniería de Inteligencia Artificial en la UNED, ASIR en The Power y Big Data, Data Science, ML y DL en MIOTI."],
+    ["Did Adrian graduate from UNED?", "The public portfolio does not establish whether Adrian graduated from UNED."],
+  ]) {
+    const response = await handleChatRequest(chatRequest(question!), {
+      environment: testEnvironment,
+      rateLimiter: new ChatRateLimiter(),
+      fetchImplementation: async () => providerReply(answer!),
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { message: answer, sources: [] });
+  }
 });
 
 test("invalid request language, source history and oversized turns never reach the provider", async () => {
