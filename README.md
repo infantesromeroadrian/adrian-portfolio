@@ -67,6 +67,8 @@ y estudios conceptuales comparten catálogo en `src/lib/public-work.ts` con los
 hechos públicos del chat. Los nuevos relatos profesionales tienen un catálogo
 separado y no amplían automáticamente el contexto del asistente. Todo el contenido sigue siendo legible sin JavaScript.
 
+El botón del menú usa dos imágenes locales de Macintosh retro: arcoíris cerrado
+y terminal abierto, con un encuadre CSS fijo y sin cambiar la lógica de navegación.
 El menú y el chat limitan su altura al espacio visible y permiten desplazamiento
 vertical. En vistas de poca altura, el chat utiliza casi toda la pantalla para
 mantener accesibles el formulario y sus controles. En móvil el orbe del asistente
