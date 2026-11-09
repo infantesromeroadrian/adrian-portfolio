@@ -12,7 +12,14 @@ la maquetación reserva espacio superior para que el botón fijo del menú no ta
 kicker. Las portadas se sirven en WebP (480, 800 y 1122 px) con `srcset`; la
 profesional lleva `fetchpriority="high"` y la ofensiva carga con prioridad baja.
 
-El orden de la página es: Intro, trabajo profesional y estudios conceptuales,
+Entre la intro y Work, una banda Macintosh presenta seis especialidades con un
+bucle horizontal de 40 segundos. Su botón de pausa conserva la elección mientras
+el puntero o el foco detienen temporalmente el movimiento. Sin JavaScript o con
+movimiento reducido, incluidas preferencias cambiadas durante la visita, muestra
+la lista completa y estática. Los estilos y el control pertenecen al componente
+`RetroSpecialties.astro`, sin dependencias ni recursos externos.
+
+El orden de la página es: Intro, especialidades, trabajo profesional y estudios conceptuales,
 AI Red Teaming, AI Security Write-ups, Certifications, Experience/Education y
 Contact, seguido del pie. Experience
 y Education comparten un bloque editorial de dos columnas iguales, con encabezados

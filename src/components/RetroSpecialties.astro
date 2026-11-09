@@ -1,0 +1,192 @@
+---
+const specialties = ["AI Security", "AWS", "Agentic AI", "Guardrails", "Red Teaming", "RAG"];
+---
+
+<section class="retro-specialties" aria-labelledby="specialties-title" data-retro-specialties>
+  <div class="specialties-chrome">
+    <span class="specialties-rainbow" aria-hidden="true"></span>
+    <h2 id="specialties-title">Specialties</h2>
+    <span class="specialties-stripes" aria-hidden="true"></span>
+    <button
+      class="specialties-pause"
+      type="button"
+      aria-label="Pause specialties animation"
+      aria-pressed="false"
+      title="Pause specialties animation"
+      data-specialties-pause
+      hidden
+    >
+      <span class="specialties-pause-icon" aria-hidden="true"></span>
+    </button>
+  </div>
+  <div class="specialties-viewport">
+    <div class="specialties-track">
+      <ul class="specialties-list" role="list">
+        {specialties.map((specialty) => <li>{specialty}</li>)}
+      </ul>
+      <ul class="specialties-list specialties-copy" aria-hidden="true">
+        {specialties.map((specialty) => <li>{specialty}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-retro-specialties]");
+  const button = root?.querySelector<HTMLButtonElement>("[data-specialties-pause]");
+
+  if (root && button) {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let paused = false;
+
+    const syncMotionPreference = (): void => {
+      root.dataset.motion = String(!reducedMotion.matches);
+      button.hidden = reducedMotion.matches;
+    };
+
+    button.addEventListener("click", () => {
+      paused = !paused;
+      root.dataset.paused = String(paused);
+      button.setAttribute("aria-pressed", String(paused));
+    });
+
+    reducedMotion.addEventListener("change", syncMotionPreference);
+    syncMotionPreference();
+  }
+</script>
+
+<style>
+  .retro-specialties {
+    width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+    margin: 0 auto 1rem;
+    border: 1px solid #111417;
+    background: #ebe8e1;
+    color: #111417;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+
+  .specialties-chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    padding-left: 0.75rem;
+    border-bottom: 1px solid #111417;
+  }
+
+  .specialties-chrome h2 {
+    margin: 0;
+    font: 600 0.8rem/1.25 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+
+  .specialties-rainbow {
+    flex: 0 0 0.75rem;
+    height: 1rem;
+    background: linear-gradient(to bottom,
+      #52824b 0% 16.67%, #e1b53c 16.67% 33.33%,
+      #d18136 33.33% 50%, #b64b49 50% 66.67%,
+      #805579 66.67% 83.33%, #4b7790 83.33% 100%);
+  }
+
+  .specialties-stripes {
+    flex: 1;
+    height: 1rem;
+    margin-right: 0.75rem;
+    background: repeating-linear-gradient(to bottom, #111417 0 1px, transparent 1px 4px);
+  }
+
+  .specialties-pause {
+    display: grid;
+    flex: 0 0 2.75rem;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid currentColor;
+    border-radius: 0;
+    background: #ebe8e1;
+    color: #111417;
+    cursor: pointer;
+  }
+
+  .specialties-pause[hidden] {
+    display: none;
+  }
+
+  .specialties-pause:focus-visible {
+    outline: 2px solid #3e6577;
+    outline-offset: -5px;
+  }
+
+  .specialties-pause-icon {
+    width: 0.75rem;
+    height: 0.875rem;
+    border-inline: 4px solid currentColor;
+  }
+
+  .specialties-pause[aria-pressed="true"] .specialties-pause-icon {
+    width: 0;
+    height: 0;
+    border: 0.4375rem solid transparent;
+    border-right: 0;
+    border-left: 0.75rem solid currentColor;
+  }
+
+  .specialties-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 0.75rem 2rem;
+    margin: 0;
+    padding: 1rem;
+    list-style: none;
+  }
+
+  .specialties-list li {
+    flex-shrink: 0;
+    font-size: clamp(0.9rem, 1.4vw, 1.125rem);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .specialties-copy {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-motion="true"] .specialties-viewport {
+      overflow: hidden;
+    }
+
+    [data-motion="true"] .specialties-track {
+      display: flex;
+    }
+
+    [data-motion="true"] .specialties-list {
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+      min-width: 100%;
+      animation: specialties-scroll 40s linear infinite;
+    }
+
+    [data-motion="true"] .specialties-copy {
+      display: flex;
+    }
+
+    [data-paused="true"] .specialties-list,
+    .retro-specialties:focus-within .specialties-list {
+      animation-play-state: paused;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) {
+    .retro-specialties:hover .specialties-list {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes specialties-scroll {
+    to { transform: translateX(-100%); }
+  }
+</style>
