@@ -2,10 +2,10 @@
 type Props = { homePath?: string };
 const { homePath = "" } = Astro.props;
 const destinations = [
+  { label: "Experience", href: "#experience" },
   { label: "Work", href: "#aws-architect" },
   { label: "Red team", href: "#ai-red-teaming" },
   { label: "Writing", href: "#medium-title" },
-  { label: "Experience", href: "#experience" },
   { label: "Contact", href: "#contact" },
 ] as const;
 ---

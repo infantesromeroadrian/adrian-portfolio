@@ -296,16 +296,16 @@ a:focus-visible {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(2rem, 5vw, 4.5rem);
+  gap: clamp(1.5rem, 3vw, 3rem);
   align-items: start;
-  padding-block: clamp(3rem, 5vw, 4.5rem);
+  padding-block: clamp(1.5rem, 2.5vw, 2.25rem);
   border-top: 1px solid #b5b4ad;
 }
 
 .career-dual::before {
   position: absolute;
-  top: clamp(3rem, 5vw, 4.5rem);
-  bottom: clamp(3rem, 5vw, 4.5rem);
+  top: clamp(1.5rem, 2.5vw, 2.25rem);
+  bottom: clamp(1.5rem, 2.5vw, 2.25rem);
   left: 50%;
   width: 1px;
   background: #b5b4ad;
@@ -317,21 +317,21 @@ a:focus-visible {
 }
 
 .career-heading {
-  margin-bottom: clamp(2rem, 3vw, 3rem);
+  margin-bottom: 1.25rem;
 }
 
 .career-heading h2 {
   margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(2.8rem, 4.5vw, 4.25rem);
+  font-size: clamp(1.9rem, 2.8vw, 2.5rem);
   font-weight: 500;
-  line-height: 0.95;
-  letter-spacing: -0.065em;
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .career-timeline {
-  --axis: 1.375rem;
-  --node-center: 2.125rem;
+  --axis: 0.875rem;
+  --node-center: 1.125rem;
 
   position: relative;
   min-width: 0;
@@ -342,7 +342,7 @@ a:focus-visible {
 
 .career-milestone {
   position: relative;
-  padding: 0.75rem 0 2.75rem 5.25rem;
+  padding: 0.25rem 0 1.25rem 3.25rem;
 }
 
 .career-milestone:last-child {
@@ -384,8 +384,8 @@ a:focus-visible {
   top: 0;
   left: 0;
   z-index: 2;
-  width: 4.25rem;
-  height: 3.5rem;
+  width: 2.75rem;
+  height: 2rem;
   color: #3e6577;
 }
 
@@ -399,17 +399,17 @@ a:focus-visible {
 }
 
 .gear-primary {
-  top: 0.75rem;
+  top: 0.25rem;
   left: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .gear-satellite {
   top: 0;
-  left: 2.125rem;
-  width: 1.75rem;
-  height: 1.75rem;
+  left: 1.5rem;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .career-timeline[data-motion="enabled"] .milestone-mechanism svg {
@@ -431,22 +431,22 @@ a:focus-visible {
 .milestone-date {
   display: block;
   color: #525b60;
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   line-height: 1.4;
 }
 
 .milestone-organisation {
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.25rem;
   color: #3e6577;
   font-size: 0.95rem;
   font-weight: 700;
 }
 
 .milestone-content h3 {
-  max-width: 24ch;
+  max-width: none;
   margin: 0;
   font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
-  font-size: clamp(1.4rem, 2.1vw, 1.9rem);
+  font-size: clamp(1.2rem, 1.65vw, 1.5rem);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.035em;
@@ -454,30 +454,22 @@ a:focus-visible {
 }
 
 .milestone-description {
-  max-width: 42ch;
-  margin: 1rem 0 0;
+  max-width: 50ch;
+  margin: 0.5rem 0 0;
   color: #525b60;
-  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
-  line-height: 1.5;
+  font-size: clamp(0.95rem, 1.2vw, 1rem);
+  line-height: 1.45;
 }
 
 .milestone-date + .milestone-organisation {
-  margin-top: 0.85rem;
-}
-
-#education .career-milestone:not(:last-child) {
-  padding-bottom: 2.25rem;
-}
-
-#education .milestone-description {
-  margin-top: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 @media (max-width: 47.5rem) {
   .career-dual {
     grid-template-columns: minmax(0, 1fr);
-    gap: 3rem;
-    padding-block: 3rem;
+    gap: 1.5rem;
+    padding-block: 1.5rem;
   }
 
   .career-dual::before {
@@ -485,12 +477,12 @@ a:focus-visible {
   }
 
   .career-section + .career-section {
-    padding-top: 3rem;
+    padding-top: 1.5rem;
     border-top: 1px solid #b5b4ad;
   }
 
   .career-heading h2 {
-    font-size: clamp(2.8rem, 10vw, 4rem);
+    font-size: clamp(1.9rem, 7vw, 2.25rem);
   }
 }
 
