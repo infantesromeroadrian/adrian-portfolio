@@ -1,4 +1,5 @@
 import { mountPortfolioOrb } from "./portfolio-orb";
+import { fetchJsonWithTimeout } from "../lib/chat-transport";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -15,7 +16,8 @@ const AVAILABILITY_TIMEOUT_MS = 5_000;
 const CHAT_TIMEOUT_MS = 16_000;
 const SHORT_RETRY_SECONDS = 60;
 
-const FAILURE_MESSAGE = "The assistant could not answer. Please try again.";
+const FAILURE_MESSAGE = "The assistant could not answer right now. Your draft is kept below. Please try again.";
+const TIMEOUT_MESSAGE = "The assistant took too long to respond. Your draft is kept below. Please try again.";
 const SHORT_RATE_LIMIT_MESSAGE = "Too many messages in a short time. Please wait a minute and try again.";
 const LONG_RATE_LIMIT_MESSAGE = "The assistant has reached its message limit. Please try again later.";
 
@@ -30,26 +32,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-async function fetchWithTimeout(
-  input: RequestInfo | URL,
-  init: RequestInit,
-  controller: AbortController,
-  timeoutMs: number,
-): Promise<Response> {
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    return await fetch(input, { ...init, signal: controller.signal });
-  } finally {
-    window.clearTimeout(timeout);
-  }
-}
-
 function mountChatWidget(root: HTMLElement): void {
   const panel = root.querySelector<HTMLElement>("[data-chat-panel]");
   const toggle = root.querySelector<HTMLButtonElement>("[data-chat-toggle]");
   const closeButton = root.querySelector<HTMLButtonElement>("[data-chat-close]");
   const body = root.querySelector<HTMLElement>("[data-chat-body]");
   const status = root.querySelector<HTMLElement>("[data-chat-status]");
+  const retryButton = root.querySelector<HTMLButtonElement>("[data-chat-retry]");
   const messages = root.querySelector<HTMLElement>("[data-chat-messages]");
   const errorMessage = root.querySelector<HTMLElement>("[data-chat-error]");
   const form = root.querySelector<HTMLFormElement>("[data-chat-form]");
@@ -60,7 +49,7 @@ function mountChatWidget(root: HTMLElement): void {
   const pauseButton = root.querySelector<HTMLButtonElement>("[data-orb-pause]");
   if (
     !panel || !toggle || !closeButton || !body || !status || !messages || !errorMessage
-    || !form || !input || !submitButton || !count || !canvas || !pauseButton
+    || !form || !input || !submitButton || !count || !canvas || !pauseButton || !retryButton
   ) return;
 
   const disposeOrb = mountPortfolioOrb(canvas, toggle, pauseButton);
@@ -69,7 +58,11 @@ function mountChatWidget(root: HTMLElement): void {
   let open = false;
   let history: ChatMessage[] = [];
   let availabilityRequest: AbortController | undefined;
-  let chatRequest: AbortController | undefined;
+  let chatRequest: {
+    controller: AbortController;
+    pendingMessage: HTMLElement;
+    text: string;
+  } | undefined;
 
   const updateControls = (): void => {
     const messageLength = input.value.length;
@@ -82,52 +75,67 @@ function mountChatWidget(root: HTMLElement): void {
     );
     submitButton.textContent = busy ? "Sending…" : "Send";
     count.textContent = `${messageLength} / ${MAX_MESSAGE_CHARACTERS}`;
-    panel.setAttribute("aria-busy", String(busy || availability === "checking"));
+    panel.setAttribute("aria-busy", String(open && (busy || availability === "checking")));
   };
 
   const setAvailability = (nextState: AvailabilityState): void => {
     availability = nextState;
     panel.dataset.availability = nextState;
     if (nextState === "checking") status.textContent = "Checking availability…";
-    if (nextState === "available") status.textContent = "The assistant is available.";
+    if (nextState === "available") status.textContent = "Ask about the public work in this portfolio.";
     if (nextState === "unavailable") {
-      status.textContent = "The assistant is unavailable. You can still browse the portfolio.";
+      status.textContent = "The assistant is unavailable right now. Check availability again or browse the portfolio.";
     }
+    retryButton.hidden = nextState !== "unavailable";
     updateControls();
   };
 
   const refreshAvailability = async (): Promise<void> => {
-    availabilityRequest?.abort();
+    const previousRequest = availabilityRequest;
     const request = new AbortController();
     availabilityRequest = request;
+    previousRequest?.abort();
+    const retryHadFocus = document.activeElement === retryButton;
+    errorMessage.hidden = true;
     setAvailability("checking");
 
     try {
-      const response = await fetchWithTimeout(
+      const { response, payload } = await fetchJsonWithTimeout(
         "/api/chat",
         { cache: "no-store", headers: { Accept: "application/json" } },
         request,
         AVAILABILITY_TIMEOUT_MS,
       );
-      const payload: unknown = response.ok ? await response.json() : null;
       if (availabilityRequest !== request || request.signal.aborted) return;
-      setAvailability(isRecord(payload) && payload.available === true ? "available" : "unavailable");
+      setAvailability(response.ok && isRecord(payload) && payload.available === true ? "available" : "unavailable");
     } catch {
-      if (availabilityRequest !== request || request.signal.aborted) return;
+      if (availabilityRequest !== request) return;
       setAvailability("unavailable");
     } finally {
-      if (availabilityRequest === request) availabilityRequest = undefined;
+      if (availabilityRequest === request) {
+        availabilityRequest = undefined;
+        if (open && retryHadFocus) {
+          (availability === "available" ? input : retryButton).focus({ preventScroll: true });
+        }
+      }
     }
   };
 
   const closePanel = (returnFocus: boolean): void => {
     if (!open) return;
     open = false;
-    availabilityRequest?.abort();
+    const activeAvailabilityRequest = availabilityRequest;
+    availabilityRequest = undefined;
+    activeAvailabilityRequest?.abort();
     const activeChatRequest = chatRequest;
     chatRequest = undefined;
-    activeChatRequest?.abort();
+    activeChatRequest?.controller.abort();
+    if (activeChatRequest) {
+      activeChatRequest.pendingMessage.remove();
+      input.value = activeChatRequest.text;
+    }
     busy = false;
+    updateControls();
     panel.hidden = true;
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Open AI portfolio assistant");
@@ -145,7 +153,7 @@ function mountChatWidget(root: HTMLElement): void {
     void refreshAvailability();
   };
 
-  const renderMessage = (message: ChatMessage): HTMLElement => {
+  const renderMessage = (message: ChatMessage, pending = false): HTMLElement => {
     const article = document.createElement("article");
     article.dataset.role = message.role;
     const heading = document.createElement("h3");
@@ -154,7 +162,7 @@ function mountChatWidget(root: HTMLElement): void {
     content.textContent = message.content;
     article.append(heading, content);
     messages.append(article);
-    while (messages.childElementCount > MAX_HISTORY_MESSAGES) {
+    while (!pending && messages.childElementCount > MAX_HISTORY_MESSAGES) {
       messages.firstElementChild?.remove();
     }
     body.scrollTop = body.scrollHeight;
@@ -166,6 +174,7 @@ function mountChatWidget(root: HTMLElement): void {
     else openPanel();
   });
   closeButton.addEventListener("click", () => closePanel(true));
+  retryButton.addEventListener("click", () => { void refreshAvailability(); });
   input.addEventListener("input", updateControls);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && open) {
@@ -191,16 +200,16 @@ function mountChatWidget(root: HTMLElement): void {
     errorMessage.hidden = true;
     const userMessage: ChatMessage = { role: "user", content: text };
     const requestMessages = [...history, userMessage].slice(-MAX_HISTORY_MESSAGES);
-    const pendingMessage = renderMessage(userMessage);
+    const pendingMessage = renderMessage(userMessage, true);
     input.value = "";
     status.textContent = "Preparing an answer…";
     updateControls();
 
-    const request = new AbortController();
+    const request = { controller: new AbortController(), pendingMessage, text };
     chatRequest = request;
     let failureMessage = FAILURE_MESSAGE;
     try {
-      const response = await fetchWithTimeout(
+      const { response, payload } = await fetchJsonWithTimeout(
         "/api/chat",
         {
           method: "POST",
@@ -210,10 +219,10 @@ function mountChatWidget(root: HTMLElement): void {
           },
           body: JSON.stringify({ messages: requestMessages }),
         },
-        request,
+        request.controller,
         CHAT_TIMEOUT_MS,
       );
-      const payload: unknown = await response.json();
+      if (chatRequest !== request || request.controller.signal.aborted) return;
       if (
         !response.ok
         || !isRecord(payload)
@@ -233,32 +242,33 @@ function mountChatWidget(root: HTMLElement): void {
       history = [...requestMessages, assistantMessage].slice(-MAX_HISTORY_MESSAGES);
       renderMessage(assistantMessage);
       status.textContent = "Answer received. AI responses may be wrong.";
-    } catch {
+    } catch (error) {
+      if (chatRequest !== request) return;
       pendingMessage.remove();
       input.value = text;
-      if (chatRequest !== request) return;
-      errorMessage.textContent = failureMessage;
+      errorMessage.textContent = error instanceof DOMException && error.name === "TimeoutError"
+        ? TIMEOUT_MESSAGE
+        : failureMessage;
       errorMessage.hidden = false;
       status.textContent = availability === "available"
-        ? "Your message was not sent."
+        ? "No answer was received. You can try again."
         : "The assistant is unavailable.";
     } finally {
       if (chatRequest !== request) return;
       chatRequest = undefined;
       busy = false;
       updateControls();
-      if (open && availability === "available") input.focus({ preventScroll: true });
+      if (open) {
+        (availability === "available" ? input : retryButton).focus({ preventScroll: true });
+      }
     }
   });
 
   window.addEventListener("pagehide", (event) => {
-    availabilityRequest?.abort();
-    chatRequest?.abort();
+    closePanel(false);
     if (!event.persisted) {
       history = [];
       disposeOrb();
-    } else {
-      closePanel(false);
     }
   });
 

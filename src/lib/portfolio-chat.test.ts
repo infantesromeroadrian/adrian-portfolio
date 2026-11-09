@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { SAFE_FALLBACK_MESSAGE } from "./chat-output-guard.ts";
-import { ChatRateLimiter, handleChatAvailability, handleChatRequest } from "./portfolio-chat.ts";
+import { ChatRateLimiter, handleChatAvailability, handleChatRequest, SYSTEM_PROMPT } from "./portfolio-chat.ts";
 
 const testEnvironment = { OLLAMA_API_KEY: "synthetic-test-key" };
 
@@ -12,6 +12,85 @@ function chatRequest(message: string, origin = "https://portfolio.example"): Req
     body: JSON.stringify({ messages: [{ role: "user", content: message }] }),
   });
 }
+
+test("provider requests use the current default model and preserve explicit overrides and generation controls", async () => {
+  for (const [configuredModel, expectedModel] of [
+    [undefined, "mistral-large-4"],
+    ["  ", "mistral-large-4"],
+    [" configured-model ", "configured-model"],
+  ]) {
+    let providerUrl: RequestInfo | URL | undefined;
+    let providerInit: RequestInit | undefined;
+    const response = await handleChatRequest(chatRequest("Summarize Adrian's experience in AI security."), {
+      environment: { ...testEnvironment, OLLAMA_MODEL: configuredModel },
+      rateLimiter: new ChatRateLimiter(),
+      fetchImplementation: async (input, init) => {
+        providerUrl = input;
+        providerInit = init;
+        return Response.json({ message: { role: "assistant", content: "Adrian is an AI Security Architect." } });
+      },
+    });
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { message: "Adrian is an AI Security Architect." });
+    assert.equal(providerUrl, "https://ollama.com/api/chat");
+    assert.equal(providerInit?.method, "POST");
+    assert.equal(new Headers(providerInit?.headers).get("Authorization"), "Bearer synthetic-test-key");
+    assert.deepEqual(JSON.parse(String(providerInit?.body)), {
+      model: expectedModel,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: "Summarize Adrian's experience in AI security." },
+      ],
+      stream: false,
+      think: false,
+      options: { num_predict: 600 },
+    });
+    assert.ok(providerInit?.signal instanceof AbortSignal);
+  }
+});
+
+test("upstream failures log only status and a controlled category while retaining the generic public error", async (context) => {
+  for (const [status, category] of [
+    [400, "request_rejected"],
+    [401, "auth"],
+    [403, "access"],
+    [404, "model_unavailable"],
+    [410, "model_unavailable"],
+    [422, "request_rejected"],
+    [429, "rate_limit"],
+    [500, "provider_unavailable"],
+    [503, "provider_unavailable"],
+    [302, "http_error"],
+  ] as const) {
+    await context.test(`upstream ${status} is classified as ${category}`, async (subtest) => {
+      const warning = subtest.mock.method(console, "warn", () => {});
+      const response = await handleChatRequest(chatRequest("user-content-sentinel"), {
+        environment: { OLLAMA_API_KEY: "secret-key-sentinel", OLLAMA_MODEL: "model-name-sentinel" },
+        rateLimiter: new ChatRateLimiter(),
+        fetchImplementation: async () => new Response("provider-body-sentinel", {
+          status,
+          headers: { "X-Private-Diagnostic": "provider-header-sentinel" },
+        }),
+      });
+
+      assert.equal(response.status, 502);
+      const payload = await response.json();
+      assert.deepEqual(payload, {
+        error: { code: "PROVIDER_ERROR", message: "The chat service is temporarily unavailable." },
+      });
+      const diagnostics = warning.mock.calls.map((call) => call.arguments);
+      assert.deepEqual(diagnostics, [["portfolio-chat: provider failed", { status, category }]]);
+      const visibleOutput = JSON.stringify({ payload, diagnostics });
+      for (const sensitive of [
+        "secret-key-sentinel", "model-name-sentinel", "user-content-sentinel",
+        "provider-body-sentinel", "provider-header-sentinel", SYSTEM_PROMPT,
+      ]) {
+        assert.ok(!visibleOutput.includes(sensitive));
+      }
+    });
+  }
+});
 
 test("recommendations receive all public write-ups, exact links and evidence limits", async () => {
   let systemMessage = "";

@@ -1604,6 +1604,23 @@ a:focus-visible {
   margin-top: 1rem;
 }
 
+.portfolio-chat__retry {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #111417;
+  border-radius: 0;
+  background: #ebe8e1;
+  color: #111417;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.portfolio-chat__retry:focus-visible {
+  outline: 3px solid #111417;
+  outline-offset: 3px;
+}
+
 .portfolio-chat__messages:empty {
   display: none;
 }

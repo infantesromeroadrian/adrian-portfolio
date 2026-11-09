@@ -102,19 +102,33 @@ el adaptador de Vercel. Configura las variables del servidor a partir de
 
 - `OLLAMA_API_KEY` es obligatoria para habilitar el chat. Debe ser una clave
   **dedicada a este portfolio** (ver «Clave dedicada»), nunca la personal.
-- `OLLAMA_MODEL` es opcional y ya incluye el modelo predeterminado en el ejemplo.
+- `OLLAMA_MODEL` es opcional; el valor predeterminado y el ejemplo usan
+  `mistral-large-4`. Sustituye a `mistral-large-3:675b` tras la
+  [retirada de Mistral Large 3](https://ollama.com/library/mistral-large-3)
+  el 9 de noviembre de 2026. Una variable configurada prevalece sobre el valor
+  predeterminado: hay que actualizarla también en Vercel y redesplegar.
 - `CHAT_ENABLED` es el interruptor de apagado: con `false` (también `0`, `off`, `no`)
   `GET /api/chat` responde `{"available":false}` y `POST` devuelve 503 sin llamar al
   proveedor. Cámbiala en Vercel y redespliega; no requiere cambios de código.
+
+`GET /api/chat` comprueba que hay una clave configurada y que el servicio está
+habilitado. No realiza una consulta a Ollama ni demuestra que la clave, el modelo
+o la cuota permitan generar una respuesta.
 
 La API acepta únicamente JSON y conversaciones de hasta ocho mensajes, con un
 máximo de 2.000 caracteres por mensaje y 32 KiB por petición. Un `POST` debe llevar un
 `Origin` idéntico al del sitio o, si el navegador lo omite, `Sec-Fetch-Site: same-origin`;
 en otro caso responde 403. Esto frena el uso desde otros sitios, no a un script, que
 puede enviar esas cabeceras: por eso existen los límites de frecuencia y el interruptor.
-Aplica aplica un timeout de 12 segundos, limita la respuesta
+Aplica un timeout de 12 segundos, limita la respuesta
 del proveedor a 64 KiB y entrega como máximo 4.000 caracteres. Las respuestas no
 se almacenan en caché y los errores públicos no incluyen datos del proveedor.
+Ante un error HTTP del proveedor, el servidor registra únicamente el estado
+numérico y una categoría controlada para distinguir autenticación, acceso, modelo
+no disponible, petición rechazada, cuota o fallo del servicio. No registra cuerpos,
+cabeceras, claves, identificadores de modelo, prompts ni mensajes; tampoco persiste
+conversaciones. La categoría orienta el diagnóstico a partir del estado HTTP y no
+demuestra por sí sola la causa concreta.
 
 Cada cliente (una IPv4 o una red IPv6 /64) puede enviar 5 mensajes por minuto y 30
 al día, y cada instancia del servidor acepta como máximo 300 al día. Al superar un

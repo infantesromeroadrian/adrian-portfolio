@@ -2,7 +2,7 @@ import { createOutputGuard, SAFE_FALLBACK_MESSAGE } from "./chat-output-guard.ts
 import { architectureStudies, PORTFOLIO_URL, securityWriteUps } from "./public-work.ts";
 
 const OLLAMA_CHAT_URL = "https://ollama.com/api/chat";
-const DEFAULT_OLLAMA_MODEL = "mistral-large-3:675b";
+const DEFAULT_OLLAMA_MODEL = "mistral-large-4";
 const COAE_CERTIFICATION_NAME = "HTB Certified Offensive AI Expert (COAE)";
 const COAE_CREDENTIAL_ID = "HTBCERT-1287C8C6C3";
 const COAE_VERIFICATION_URL = "https://www.hackthebox.com/certificates";
@@ -504,6 +504,25 @@ function screenedAnswer(answer: string): string {
   return SAFE_FALLBACK_MESSAGE;
 }
 
+type ProviderFailureCategory =
+  | "auth"
+  | "access"
+  | "model_unavailable"
+  | "request_rejected"
+  | "rate_limit"
+  | "provider_unavailable"
+  | "http_error";
+
+function providerFailureCategory(status: number): ProviderFailureCategory {
+  if (status === 401) return "auth";
+  if (status === 403) return "access";
+  if (status === 404 || status === 410) return "model_unavailable";
+  if (status === 429) return "rate_limit";
+  if (status >= 400 && status < 500) return "request_rejected";
+  if (status >= 500) return "provider_unavailable";
+  return "http_error";
+}
+
 async function requestOllama(
   messages: readonly ChatMessage[],
   apiKey: string,
@@ -535,6 +554,11 @@ async function requestOllama(
     });
 
     if (!response.ok) {
+      // Status categories aid diagnosis without retaining untrusted provider text or conversation data.
+      console.warn("portfolio-chat: provider failed", {
+        status: response.status,
+        category: providerFailureCategory(response.status),
+      });
       await response.body?.cancel();
       throw new PublicChatError(502, "PROVIDER_ERROR", "The chat service is temporarily unavailable.");
     }
