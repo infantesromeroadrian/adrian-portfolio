@@ -1,8 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import SiteNavigation from "../../components/SiteNavigation.astro";
-import ChatWidget from "../../components/ChatWidget.astro";
+import SiteControls from "../../components/SiteControls.astro";
 import { architectureStudies } from "../../lib/public-work";
 import { professionalCases, professionalCasePaths, type ProfessionalCase } from "../../lib/professional-work";
 
@@ -27,7 +26,7 @@ const contentGroups: readonly (readonly CaseSection[])[] = isRecoveryPilot
 ---
 
 <BaseLayout title={`${study.title} — Adrian Infantes`} description={study.introduction}>
-  <SiteNavigation homePath="/" />
+  <SiteControls homePath="/" />
   <main class="architecture-case professional-case" id="case-top">
     <header class="architecture-case__header">
       <a class="architecture-study__link" href="/#aws-architect">← Back to Work</a>
@@ -147,7 +146,6 @@ const contentGroups: readonly (readonly CaseSection[])[] = isRecoveryPilot
   </main>
   <footer class="portfolio-footer">
     <a href="/">Adrian Infantes</a>
-    <a href="#case-top">Back to top</a>
+    <a href="#site-top">Back to top</a>
   </footer>
-  <ChatWidget />
 </BaseLayout>

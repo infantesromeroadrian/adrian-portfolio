@@ -1,0 +1,12 @@
+---
+import SiteNavigation from "./SiteNavigation.astro";
+import ChatWidget from "./ChatWidget.astro";
+
+type Props = { homePath?: string };
+const { homePath = "" } = Astro.props;
+---
+
+<header id="site-top" class="site-controls">
+  <SiteNavigation homePath={homePath} />
+  <ChatWidget />
+</header>

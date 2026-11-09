@@ -14,7 +14,7 @@ function mountNavigation(root: HTMLElement): void {
     panel.hidden = true;
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Open site navigation");
-    if (returnFocus) toggle.focus({ preventScroll: true });
+    if (returnFocus) toggle.focus();
   };
 
   const openMenu = (): void => {

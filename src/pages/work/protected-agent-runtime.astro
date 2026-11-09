@@ -1,12 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import SiteNavigation from "../../components/SiteNavigation.astro";
-import ChatWidget from "../../components/ChatWidget.astro";
+import SiteControls from "../../components/SiteControls.astro";
 import { protectedAgentCase as studyCase, protectedAgentStudy as study, protectedAgentWriteUp as writeUp } from "../../lib/public-work";
 ---
 
 <BaseLayout title={`${study.title} — Adrian Infantes`} description={study.problem}>
-  <SiteNavigation homePath="/" />
+  <SiteControls homePath="/" />
   <main class="architecture-case" id="case-top">
     <header class="architecture-case__header">
       <a class="architecture-study__link" href="/#aws-architect">← Back to Work</a>
@@ -66,7 +65,6 @@ import { protectedAgentCase as studyCase, protectedAgentStudy as study, protecte
   </main>
   <footer class="portfolio-footer">
     <a href="/">Adrian Infantes</a>
-    <a href="#case-top">Back to top</a>
+    <a href="#site-top">Back to top</a>
   </footer>
-  <ChatWidget />
 </BaseLayout>

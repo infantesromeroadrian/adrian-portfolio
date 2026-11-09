@@ -7,8 +7,7 @@ import AwsArchitect from "../components/AwsArchitect.astro";
 import Certifications from "../components/Certifications.astro";
 import HackTheBoxHighlight from "../components/HackTheBoxHighlight.astro";
 import Contact from "../components/Contact.astro";
-import ChatWidget from "../components/ChatWidget.astro";
-import SiteNavigation from "../components/SiteNavigation.astro";
+import SiteControls from "../components/SiteControls.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
@@ -16,7 +15,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   title="Adrian Infantes — AI Security Architect"
   description="Portfolio of Adrian Infantes, AI Security Architect and AI Red Teamer."
 >
-  <SiteNavigation />
+  <SiteControls />
   <main>
     <IdentityIntro />
     <RetroSpecialties />
@@ -29,7 +28,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   </main>
   <footer class="portfolio-footer">
     <span>Adrian Infantes</span>
-    <a href="#intro-title">Back to top</a>
+    <a href="#site-top">Back to top</a>
   </footer>
-  <ChatWidget />
 </BaseLayout>

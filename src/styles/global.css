@@ -330,8 +330,8 @@ a:focus-visible {
 }
 
 .career-timeline {
-  --axis: 0.875rem;
-  --node-center: 1.125rem;
+  --axis: 0.375rem;
+  --node-center: 0.875rem;
 
   position: relative;
   min-width: 0;
@@ -342,7 +342,7 @@ a:focus-visible {
 
 .career-milestone {
   position: relative;
-  padding: 0.25rem 0 1.25rem 3.25rem;
+  padding: 0.25rem 0 1.25rem 1.5rem;
 }
 
 .career-milestone:last-child {
@@ -379,53 +379,29 @@ a:focus-visible {
   transform-origin: top;
 }
 
-.milestone-mechanism {
+.milestone-node {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: calc(var(--node-center) - 0.3125rem);
+  left: calc(var(--axis) - 0.3125rem);
   z-index: 2;
-  width: 2.75rem;
-  height: 2rem;
+  width: 0.625rem;
+  height: 0.625rem;
+  border: 1px solid currentColor;
+  background: currentColor;
   color: #3e6577;
 }
 
-.milestone-mechanism svg {
-  position: absolute;
-  display: block;
-  overflow: visible;
-  fill: #ebe8e1;
-  stroke: currentColor;
-  stroke-width: 1.2;
-}
-
-.gear-primary {
-  top: 0.25rem;
-  left: 0;
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.gear-satellite {
-  top: 0;
-  left: 1.5rem;
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-.career-timeline[data-motion="enabled"] .milestone-mechanism svg {
-  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.career-timeline[data-motion="enabled"] [data-active="false"] .milestone-mechanism {
+.career-timeline[data-motion="enabled"] [data-active="false"] .milestone-node {
   color: #81817c;
+  background: #ebe8e1;
 }
 
-.career-timeline[data-motion="enabled"] [data-active="true"] .gear-primary {
-  transform: rotate(30deg);
-}
-
-.career-timeline[data-motion="enabled"] [data-active="true"] .gear-satellite {
-  transform: rotate(-45deg);
+.milestone-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 0.25rem;
 }
 
 .milestone-date {
@@ -436,7 +412,7 @@ a:focus-visible {
 }
 
 .milestone-organisation {
-  margin: 0 0 0.25rem;
+  margin: 0;
   color: #3e6577;
   font-size: 0.95rem;
   font-weight: 700;
@@ -459,10 +435,6 @@ a:focus-visible {
   color: #525b60;
   font-size: clamp(0.95rem, 1.2vw, 1rem);
   line-height: 1.45;
-}
-
-.milestone-date + .milestone-organisation {
-  margin-top: 0.25rem;
 }
 
 @media (max-width: 47.5rem) {
@@ -1229,10 +1201,6 @@ a:focus-visible {
     background: #3e6577;
   }
 
-  .career-timeline .milestone-mechanism svg {
-    transform: none !important;
-  }
-
   *,
   *::before,
   *::after {
@@ -1945,6 +1913,66 @@ a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .portfolio-chat__panel {
     transition: none;
+  }
+}
+
+@media (max-width: 60rem) {
+  .site-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: min(calc(100% - 2 * var(--page-gutter)), var(--editorial-width));
+    margin-inline: auto;
+    padding-block: 0.75rem 1.5rem;
+  }
+
+  .site-controls > .site-navigation {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+
+  .site-controls > .portfolio-chat {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .site-controls .site-navigation__toggle,
+  .site-controls .portfolio-chat__toggle {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+  }
+
+  .site-controls .portfolio-chat__toggle,
+  .site-controls .portfolio-chat__toggle canvas,
+  .site-controls .portfolio-chat__fallback {
+    width: 48px;
+    height: 48px;
+  }
+
+  .site-controls .portfolio-chat__toggle-close {
+    top: 13px;
+    left: 13px;
+  }
+
+  .site-controls .site-navigation__fallback {
+    width: auto;
+    margin: 0;
+  }
+
+  .site-controls .site-navigation__fallback a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .site-controls .portfolio-chat__noscript {
+    width: auto;
+    margin: 1.75rem 0 0;
   }
 }
 

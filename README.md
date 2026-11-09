@@ -7,9 +7,8 @@ la identidad de AI Red Teamer bajo la portada de AI Security Architect.
 La portada abre el propio portfolio en `/`, dentro de un bloque de ancho máximo
 centrado. Bajo el rol muestra una franja de pruebas con enlaces internos (Hack The
 Box Global Top 10, COAE, certificaciones AWS y las cinco arquitecturas). En móvil,
-el nombre y la miniportada comparten fila; la franja y About continúan debajo, y
-la maquetación reserva espacio superior para que el botón fijo del menú no tape el
-kicker. Las portadas se sirven en WebP (480, 800 y 1122 px) con `srcset`; la
+el nombre y la miniportada comparten fila; la franja y About continúan debajo.
+Las portadas se sirven en WebP (480, 800 y 1122 px) con `srcset`; la
 profesional lleva `fetchpriority="high"` y la ofensiva carga con prioridad baja.
 
 Entre la intro y Work, una banda Macintosh presenta seis especialidades con un
@@ -19,19 +18,18 @@ movimiento reducido, incluidas preferencias cambiadas durante la visita, muestra
 la lista completa y estática. Los estilos y el control pertenecen al componente
 `RetroSpecialties.astro`, sin dependencias ni recursos externos.
 
-El orden de la página es: Intro, especialidades, trabajo profesional y estudios conceptuales,
-AI Red Teaming, AI Security Write-ups, Certifications, Experience/Education y
+El orden de la página es: Intro, especialidades, Experience/Education, trabajo profesional y estudios conceptuales,
+AI Red Teaming, AI Security Write-ups, Certifications y
 Contact, seguido del pie. Experience
 y Education comparten un bloque editorial de dos columnas iguales, con encabezados
 alineados y un divisor central, también a 768 px; por debajo de 47,5 rem se apilan
 y el divisor pasa a ser horizontal. Experience muestra periodos profesionales.
 Education muestra ASIR (FP Superior) en The Power, el grado de UNED y los dos
 programas de MIOTI, en ese orden. Ninguna entrada académica publica fechas ni
-estado de finalización. Cada mecanismo combina
-una rueda principal y una satélite que giran en sentidos opuestos al alcanzar el
-hito; los dos ejes avanzan con scroll nativo. Todo el contenido permanece visible
-sin JavaScript; con reduced-motion los ejes se muestran completos y los engranajes
-no giran.
+estado de finalización. Los nodos cuadrados señalan los hitos y los dos ejes avanzan
+de forma independiente con scroll nativo. Empresa y periodo comparten una fila de
+metadatos que puede ajustarse a varias líneas. Todo el contenido permanece visible
+sin JavaScript; con reduced-motion los ejes se muestran completos.
 
 El folio de trabajo destaca un caso profesional y presenta otros cuatro en filas
 con previews que enlazan a sus páginas. Los cinco relatos anonimizados se mantienen
@@ -80,8 +78,11 @@ El botón del menú usa dos imágenes locales de Macintosh retro: arcoíris cerr
 y terminal abierto, con un encuadre CSS fijo y sin cambiar la lógica de navegación.
 El menú y el chat limitan su altura al espacio visible y permiten desplazamiento
 vertical. En vistas de poca altura, el chat utiliza casi toda la pantalla para
-mantener accesibles el formulario y sus controles. En móvil el orbe del asistente
-reduce su tamaño y el pie añade margen inferior para que no tape el final. El
+mantener accesibles el formulario y sus controles. Hasta 960 px, `SiteControls`
+coloca una sola instancia de Menu y Ask AI en una cabecera dentro del flujo normal,
+antes del contenido en la portada y los casos. Los controles se desplazan con la
+página; para volver a abrirlos se regresa al principio. En escritorio siguen
+flotantes. Los paneles abiertos pueden superponerse deliberadamente. El
 panel incluye un desplegable «How this assistant is secured».
 
 Los metadatos canonical, Open Graph y Twitter usan el dominio público y una tarjeta

@@ -2,10 +2,11 @@
 type EducationMilestone = {
   organisation: string;
   title: string;
-  description: string;
+  description?: string;
 };
 
 type ExperienceMilestone = EducationMilestone & {
+  description: string;
   date: string;
   label: string;
 };
@@ -43,32 +44,26 @@ const timelines = [
       {
         organisation: "The Power",
         title: "Networked Computer Systems Administration (ASIR)",
-        description: "Advanced vocational training (FP Superior) in network and systems administration.",
+        description: "Advanced vocational training (FP Superior).",
       },
       {
         organisation: "UNED",
         title: "Bachelor’s Degree in Artificial Intelligence Engineering",
-        description: "Undergraduate studies in artificial intelligence engineering.",
       },
       {
         organisation: "MIOTI",
         title: "Big Data & Data Science Master",
-        description: "240-hour programme in big data and data science.",
+        description: "240-hour programme.",
       },
       {
         organisation: "MIOTI",
         title: "Master in Machine Learning & Deep Learning",
-        description: "240-hour programme focused on machine learning and deep learning.",
+        description: "240-hour programme.",
       },
     ],
   },
 ] satisfies Timeline[];
 
-const gearPoints = (teeth: number) => Array.from({ length: teeth * 4 }, (_, index) => {
-  const angle = (index * Math.PI) / (teeth * 2);
-  const radius = index % 4 < 2 ? 22 : 18;
-  return `${24 + radius * Math.cos(angle)},${24 + radius * Math.sin(angle)}`;
-}).join(" ");
 ---
 
 <div class="career-dual">
@@ -80,25 +75,16 @@ const gearPoints = (teeth: number) => Array.from({ length: teeth * 4 }, (_, inde
     <ol class="career-timeline" data-career-timeline role="list">
       {timeline.milestones.map((milestone) => (
         <li class="career-milestone" data-career-milestone>
-          <span class="milestone-mechanism" aria-hidden="true">
-            <svg class="gear-primary" viewBox="0 0 48 48" focusable="false">
-              <polygon points={gearPoints(12)} />
-              <circle cx="24" cy="24" r="13" />
-              <path d="M24 11v8m0 10v8M11 24h8m10 0h8" />
-              <circle cx="24" cy="24" r="5" />
-            </svg>
-            <svg class="gear-satellite" viewBox="0 0 48 48" focusable="false">
-              <polygon points={gearPoints(8)} />
-              <circle cx="24" cy="24" r="8" />
-            </svg>
-          </span>
+          <span class="milestone-node" aria-hidden="true"></span>
           <div class="milestone-content">
-            {"date" in milestone && (
-              <time class="milestone-date" datetime={milestone.date}>{milestone.label}</time>
-            )}
-            <p class="milestone-organisation">{milestone.organisation}</p>
+            <div class="milestone-meta">
+              <p class="milestone-organisation">{milestone.organisation}</p>
+              {"date" in milestone && (
+                <time class="milestone-date" datetime={milestone.date}>{milestone.label}</time>
+              )}
+            </div>
             <h3>{milestone.title}</h3>
-            <p class="milestone-description">{milestone.description}</p>
+            {"description" in milestone && <p class="milestone-description">{milestone.description}</p>}
           </div>
         </li>
       ))}
@@ -112,7 +98,7 @@ const gearPoints = (teeth: number) => Array.from({ length: teeth * 4 }, (_, inde
     element,
     milestones: [...element.querySelectorAll<HTMLElement>("[data-career-milestone]")].map((milestone) => ({
       element: milestone,
-      node: milestone.querySelector<SVGElement>(".gear-primary")!,
+      node: milestone.querySelector<HTMLElement>(".milestone-node")!,
     })),
   }));
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");

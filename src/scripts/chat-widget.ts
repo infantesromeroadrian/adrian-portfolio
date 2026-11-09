@@ -159,7 +159,7 @@ function mountChatWidget(root: HTMLElement): void {
     panel.hidden = true;
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", CHAT_COPY[language].open);
-    if (returnFocus) toggle.focus({ preventScroll: true });
+    if (returnFocus) toggle.focus();
   };
 
   const openPanel = (): void => {
